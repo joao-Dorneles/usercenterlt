@@ -10,5 +10,9 @@ def index():
 def cadastro():
     return render_template("cadastro.html")
 
+@app.route("/hubjogos")
+def cadastro():
+    return render_template("hubjogos.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
