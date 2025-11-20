@@ -11,7 +11,7 @@ def cadastro():
     return render_template("cadastro.html")
 
 @app.route("/hubjogos")
-def cadastro():
+def hubjogos():
     return render_template("hubjogos.html")
 
 if __name__ == "__main__":
