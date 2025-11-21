@@ -18,5 +18,9 @@ def hubjogos():
 def deliverydash():
     return render_template("deliverydash.html")
 
+@app.route("/conta")
+def conta():
+    return render_template("conta.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
