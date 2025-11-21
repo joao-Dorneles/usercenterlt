@@ -60,15 +60,15 @@
             display: grid;
             grid-template-columns: 100px 100px 100px;
             grid-template-rows: 100px 100px;
-            gap: 15px;
+            gap: -10px;
             justify-content: center;
             align-items: center;
             user-select: none;
         }
 
         .btn {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             background: rgba(0, 255, 153, 0.15);
             border: 2px solid #00ff99;
             border-radius: 50%;
@@ -89,6 +89,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- MUSICA DE FUNDO -->
@@ -119,14 +120,14 @@
         <source src="../static/audio/start.mp3" type="audio/mpeg">
     </audio>
 
-    
+
     <div id="hud">Velocidade: <span id="speed">0</span> | Pontos: <span id="score">0</span> | Vidas: <span
             id="lives">3</span></div>
     <div id="gameOver">🚗 GAME OVER 🚗<br><small>Pressione R para reiniciar</small></div>
     <div id="countdown"></div>
 
     <div id="gameWrapper">
-        <canvas id="gameCanvas" width="480" height="640"></canvas>
+        <canvas id="gameCanvas" width="480" height="550"></canvas>
     </div>
 
     <div id="controls">
@@ -137,6 +138,19 @@
         <div class="btn" data-dir="down">▼</div>
         <div class="btn" data-dir="right">▶</div>
     </div>
+
+    <button id="pauseBtn" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 18px;
+    background: #ffcc00;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+">⏸</button>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
@@ -225,7 +239,7 @@
         /* ---------------------------
            Variáveis do jogo
         --------------------------- */
-        let roadSpeed = 3, acceleration = 0.0002, playerSpeed = 4;
+        let roadSpeed = 3, acceleration = 0.0003, playerSpeed = 5;
         let playerX = canvas.width / 2 - 20, playerY = canvas.height - 120;
         const roadWidth = 300, laneCount = 4, laneWidth = roadWidth / laneCount;
         let roadLines = [], keys = {}, score = 0, lives = 3;
@@ -240,9 +254,9 @@
         const player = { x: playerX, y: playerY, w: 20, h: 35, color: "#00ff99" };
 
         const obstacleTypes = [
-            { emoji: "🚧", w: 30, h: 30 },
-            { emoji: "🐶", w: 30, h: 30 },
-            { emoji: "🪨", w: 25, h: 25 }
+            { emoji: "🚧", w: 15, h: 15 },
+            { emoji: "🐶", w: 15, h: 15 },
+            { emoji: "🪨", w: 15, h: 15 }
         ];
 
         // pontos reduzidos conforme seu pedido
@@ -425,6 +439,7 @@
 
         function draw() {
             if (!gameStarted) return;
+            if (paused) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const roadX = canvas.width / 2 - roadWidth / 2;
             ctx.fillStyle = "#333"; ctx.fillRect(roadX, 0, roadWidth, canvas.height);
@@ -467,6 +482,19 @@
             if (!gameOver) requestAnimationFrame(draw);
         }
 
+        let paused = false;
+        const pauseBtn = document.getElementById("pauseBtn");
+
+        pauseBtn.addEventListener("click", () => {
+            paused = !paused;
+
+            if (paused) {
+                pauseBtn.textContent = "▶";
+            } else {
+                pauseBtn.textContent = "⏸";
+                requestAnimationFrame(draw);
+            }
+        });
         function startCountdown() {
             let count = 3;
             countdownEl.textContent = count;
