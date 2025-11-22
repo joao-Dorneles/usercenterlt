@@ -29,6 +29,7 @@ header {
     height: 150px;
     justify-content: space-between;
     align-items: center;
+    padding: 1rem;
 }
 
 #logo {
@@ -143,6 +144,12 @@ header {
     padding: 1rem;
     color: #FAF2E1;
     font-family: "InkNutAntiqua", serif;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.botao-excluir:hover {
+    box-shadow: 0 0 10px #D83737;
 }
 
 .waves {
@@ -220,6 +227,24 @@ header {
     }
 }
 
+@media (min-height: 550px) and (max-height: 600px) {
+    header {
+        padding-top: 15rem;
+    }
+}
+
+@media (min-height: 601px) and (max-height: 700px) {
+    header {
+        padding-top: 10rem;
+    }
+}
+
+@media (min-height: 701px) and (max-height: 750px) {
+    header {
+        padding-top: 5rem;
+    }
+}
+
 @media (min-width: 390px) {
     #logo {
         width: 150px;
@@ -233,9 +258,79 @@ header {
 
 }
 
+@media (min-width: 540px) {
+    .minhas-infos {
+        width: 30rem;
+    }
+
+    h3 {
+        margin: 0;
+    }
+
+    .text-minhas-infos {
+        font-size: 2rem;
+    }
+
+    .cartao-infos {
+        width: 100%;
+    }
+
+    .dados,
+    .nomes-indice {
+        font-size: 1.3rem;
+    }
+}
+
 @media (min-width: 768px) {
     #logo {
         width: 200px;
         margin-top: 20px;
+    }
+
+    .minhas-infos {
+        width: 40rem;
+    }
+
+    h3 {
+        margin: 0;
+    }
+
+    .text-minhas-infos {
+        font-size: 3rem;
+    }
+
+    .cartao-infos {
+        width: 100%;
+        height: 100%;
+    }
+
+    .dados,
+    .nomes-indice {
+        font-size: 1.6rem;
+    }
+
+    .botao-excluir {
+        width: 15rem;
+        height: 7rem;
+        font-size: 1.4rem;
+    }
+
+    .botao-editar {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .img-editar {
+        width: 1.3rem;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1900px) {
+    #logo {
+        width: 100px;
+    }
+
+    header {
+        margin-top: 7rem;
     }
 }
