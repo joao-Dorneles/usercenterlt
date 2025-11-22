@@ -30,25 +30,75 @@
             </div>
             <div class="infos">
                 <ul class="ul-infos">
-                    <li class="dados">exemplo@gmail.com <button class="botao-editar"><a class="link-editar"
-                                href="#"><img class="img-editar" src="../static/images/icons/edit.png"
-                                    alt="editar"></a></button> </li>
-                    <li class="dados">exemplo da silva <button class="botao-editar"><a class="link-editar" href="#"><img
-                                    class="img-editar" src="../static/images/icons/edit.png" alt="editar"></a></button>
+                    <li class="dados">exemplo@gmail.com <button id="botao-editar-email" class="botao-editar"><img
+                                class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button></li>
+                    <li class="dados">exemplo da silva <button id="botao-editar-nome" class="botao-editar"><img
+                                class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button>
                     </li>
-                    <li class="dados">12345 <button class="botao-editar"><a class="link-editar" href="#"><img
-                                    class="img-editar" src="../static/images/icons/edit.png" alt="editar"></a></button>
+                    <li class="dados">12345 <button id="botao-editar-senha" class="botao-editar"><img class="img-editar"
+                                src="../static/images/icons/edit.png" alt="editar"></button>
                     </li>
-                    <li class="dados">123.456.789-10 <button class="botao-editar"><a class="link-editar" href="#"><img
-                                    class="img-editar" src="../static/images/icons/edit.png" alt="editar"></a></button>
+                    <li class="dados">123.456.789-10 <button id="botao-editar-cpf" class="botao-editar"><img
+                                class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <button class="botao-excluir"><a class="link-excluir">Excluir Conta</a></button>
+        <button class="botao-excluir">Excluir Conta</button>
     </div>
 
+    <div class="editar" id="editar-email">
+        <form class="form-editar">
+            <label for="email" class="label-editar">Editar Email</label>
+            <input type="email" class="input-editar" placeholder="Informe o Novo Email">
+            <div class="botoes-acao">
+                <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
+                <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="editar" id="editar-nome">
+        <form class="form-editar">
+            <label for="text" class="label-editar">Editar Nome</label>
+            <input type="text" class="input-editar" placeholder="Informe o Novo Nome">
+            <div class="botoes-acao">
+                <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
+                <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="editar" id="editar-senha">
+        <form class="form-editar">
+            <label for="password" class="label-editar">Editar Senha</label>
+            <input type="password" class="input-editar" placeholder="Informe a Nova Senha">
+            <div class="botoes-acao">
+                <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
+                <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="editar" id="editar-cpf">
+        <form class="form-editar">
+            <label for="text" class="label-editar">Editar Cpf</label>
+            <input type="text" class="input-editar" placeholder="Informe o Novo Cpf">
+            <div class="botoes-acao">
+                <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
+                <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="excluir" id="id-exclui">
+        <h3 class="texto-alerta">Tem certeza que deseja excluir sua conta?<br>Esta ação não é reversível!</h3>
+        <div class="botoes-acao">
+            <button id="confirmar-exclusao">Excluir</button>
+            <button id="cancelar-exclusao" class="cancelar-excluir">Cancelar</button>
+        </div>
+    </div>
 
 
     <!-- div da animcao inferior -->
@@ -71,5 +121,53 @@
     <script>
         new window.VLibras.Widget('https://vlibras.gov.br/app');
     </script>
+
+    <script>
+        document.getElementById("botao-editar-email")
+            .addEventListener("click", () => {
+                const editar =
+                    document.getElementById("editar-email");
+                editar.style.display = "flex"
+            });
+
+        document.getElementById("botao-editar-nome")
+            .addEventListener("click", () => {
+                const editar =
+                    document.getElementById("editar-nome");
+                editar.style.display = "flex"
+            });
+
+        document.getElementById("botao-editar-senha")
+            .addEventListener("click", () => {
+                const editar =
+                    document.getElementById("editar-senha");
+                editar.style.display = "flex"
+            });
+
+        document.getElementById("botao-editar-cpf")
+            .addEventListener("click", () => {
+                const editar =
+                    document.getElementById("editar-cpf");
+                editar.style.display = "flex"
+            });
+        document.querySelectorAll(".cancelar").forEach(botao => {
+            botao.addEventListener("click", (e) => {
+                e.target.closest(".editar").style.display = "none";
+            });
+        });
+
+        document.querySelectorAll(".cancelar-excluir").forEach(botao => {
+            botao.addEventListener("click", (e) => {
+                e.target.closest(".excluir").style.display = "none";
+            });
+        });
+
+        document.querySelectorAll(".botao-excluir").forEach(botao => {
+            botao.addEventListener("click", () => {
+                document.querySelector(".excluir").style.display = "flex";
+            });
+        });
+    </script>
 </body>
-</html>
+
+</html>|
