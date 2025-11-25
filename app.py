@@ -18,6 +18,10 @@ def hubjogos():
 def deliverydash():
     return render_template("deliverydash.html")
 
+@app.route("/snake")
+def snake():
+    return render_template("snake.html")
+
 @app.route("/conta")
 def conta():
     return render_template("conta.html")
