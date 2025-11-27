@@ -143,6 +143,7 @@ p {
 
 table {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 10px;
@@ -168,13 +169,23 @@ td {
     font-weight: 100;
 }
 
+thead {
+    width: 100%;
+}
+
 .tr-topo {
     background-color: #D86037;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20%;
 }
 
-.td-topo {
+.th-topo {
     color: #FAF2E1;
+    font-weight: 100;
+    font-family: "Jersey 10", sans-serif;
 }
 
 .destaque {
@@ -231,7 +242,7 @@ td {
     .jogos-disponiveis {
         font-size: 4rem;
     }
-    
+
     .titulo-classificacao {
         font-size: 4rem;
     }
@@ -243,7 +254,7 @@ td {
     }
 }
 
-@media(min-height: 500px){
+@media(min-height: 500px) {
     header {
         height: 15rem;
     }
