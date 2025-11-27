@@ -4,13 +4,147 @@
 <head>
     <meta charset="utf-8">
     <title>Jogo da Cobrinha</title>
-    <link rel="stylesheet" href="../static/snake.css">
     <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: black;
+        }
+
+        .wrapper {
+            width: 65vmin;
+            height: 70vmin;
+            display: flex;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: center;
+            border-radius: 5px;
+            background: #435168;
+            box-shadow: 0 0 100px rgba(52, 87, 220, 0.2);
+        }
+
+        .game-details {
+            color: #B8C6DC;
+            font-weight: 500;
+            font-size: 1.2rem;
+            padding: 20px 27px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .play-board {
+            height: 100%;
+            width: 100%;
+            display: grid;
+            background: #212837;
+            grid-template: repeat(30, 1fr) / repeat(30, 1fr);
+        }
+
+        .play-board .food {
+            background: #FF003D;
+            border-radius: 100px;
+        }
+
+        .play-board .head {
+            background: #6dff60;
+        }
+
+        .controls {
+            display: none;
+            justify-content: space-between;
+        }
+
+        .controls i {
+            padding: 25px 0;
+            text-align: center;
+            font-size: 1.3rem;
+            color: #B8C6DC;
+            width: calc(100% / 4);
+            cursor: pointer;
+            border-right: 1px solid #171B26;
+        }
+
+        @media screen and (max-width: 1025px) {
+
+            /* AQUI: deixa a wrapper mais alta no mobile */
+            .wrapper {
+                height: 95vmin;
+                padding-bottom: 20px;
+            }
+
+            /* mantém sua responsividade dos botões */
+            .controls {
+                display: grid;
+                grid-template-columns: repeat(3, 55px);
+                grid-template-rows: 55px 55px;
+                gap: 8px;
+                justify-content: center;
+                margin: 12px auto 0;
+            }
+
+            .controls i {
+                width: 55px;
+                height: 55px;
+                background: rgba(255, 255, 255, 0.08);
+                border: 2px solid #B8C6DC;
+                border-radius: 50%;
+                color: #B8C6DC;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 22px;
+                font-weight: bold;
+                transition: 0.1s ease;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+
+            .controls i:active {
+                background: rgba(255, 255, 255, 0.25);
+                transform: scale(0.92);
+            }
+
+            .controls i[data-key="ArrowUp"] {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .controls i[data-key="ArrowDown"] {
+                grid-column: 2;
+                grid-row: 2;
+            }
+
+            .controls i[data-key="ArrowLeft"] {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .controls i[data-key="ArrowRight"] {
+                grid-column: 3;
+                grid-row: 2;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
+
     <div class="wrapper">
         <div class="game-details">
             <span class="score">Pontuação: 0</span>
@@ -21,7 +155,7 @@
             <i data-key="ArrowLeft" class="fa-solid fa-arrow-left-long"></i>
             <i data-key="ArrowUp" class="fa-solid fa-arrow-up-long"></i>
             <i data-key="ArrowRight" class="fa-solid fa-arrow-right-long"></i>
-            <i data-key="ArrowDown" class="fa-solid fa-arrow-down-long"></i> 
+            <i data-key="ArrowDown" class="fa-solid fa-arrow-down-long"></i>
         </div>
     </div>
 
