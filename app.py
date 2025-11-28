@@ -1,15 +1,24 @@
-from flask import Flask
+import os
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev-secret-if-missing")
+
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -35,4 +44,7 @@ def conta():
     return render_template("conta.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    with app.app_context():
+        db.create_all()
+    debug_mode = os.getenv("FLASK_ENV", "development") != "production"
+    app.run(debug=debug_mode)
