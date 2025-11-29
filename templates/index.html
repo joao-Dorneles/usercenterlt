@@ -19,7 +19,7 @@
 
     <div class="formulario">
         <h2>Entrar</h2>
-        <form id="login-form">
+        <form id="login-form" method="post" action="/">
             <label for="email">E-mail</label>
             <input id="email" type="email" name="email" required placeholder="Insira seu email">
 
@@ -70,7 +70,7 @@
                 return;
             }
 
-            window.location.href = "./cadastro.html";
+            form.submit();
         });
     </script>
 

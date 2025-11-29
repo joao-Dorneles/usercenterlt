@@ -19,7 +19,7 @@
 
     <div class="formulario">
         <h2>Cadastrar</h2>
-        <form id="login-form">
+        <form id="login-form" method="post" action="/cadastro">
             <label for="nome">Nome</label>
             <input id="nome" type="text" name="nome" required placeholder="Informe seu nome">
 
@@ -96,7 +96,7 @@
                 return;
             }
 
-            window.location.href = "./index.html";
+            form.submit();
         });
 
     </script>
