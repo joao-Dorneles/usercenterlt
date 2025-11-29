@@ -28,6 +28,10 @@
 
             <label for="senha">Senha</label>
             <input id="senha" type="password" name="senha" required placeholder="Crie sua senha">
+            <div id="exibir-senha">
+                <input id="exibir" type="checkbox">
+                <label id="label-exibir-senha" for="exibir">Exibir Senha</label>
+            </div>
 
             <label for="cpf">CPF</label>
             <input id="cpf" type="text" name="cpf" required placeholder="Informe seu cpf">
@@ -95,6 +99,19 @@
             window.location.href = "./index.html";
         });
 
+    </script>
+
+    <!-- script para exibir senha -->
+    <script>
+        const checkboxExibir = document.getElementById ('exibir');
+        const CampoSenha = document.getElementById ('senha');
+        checkboxExibir.addEventListener('change', function() {
+            if (checkboxExibir.checked) {
+                CampoSenha.type = 'text'
+            } else {
+                CampoSenha.type = 'password'
+            }
+        });
     </script>
 
 </body>

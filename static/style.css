@@ -66,6 +66,23 @@ label {
     color: #52362B;
 }
 
+#exibir {
+    margin: 0;
+    width: 1.3rem;
+    accent-color: #D83737;
+    cursor: pointer;
+}
+
+#exibir-senha {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#label-exibir-senha {
+    font-size: 0.8rem
+}
+
 #recuperar-senha {
     font-family: "InkNutAntiqua", serif;
     font-size: 8px;

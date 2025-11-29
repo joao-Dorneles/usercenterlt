@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../static/style.css">
     <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
 </head>
+
 <body>
 
     <header>
@@ -24,6 +25,10 @@
 
             <label for="senha">Senha</label>
             <input id="senha" type="password" name="senha" required placeholder="Insira sua senha">
+            <div id="exibir-senha">
+                <input id="exibir" type="checkbox">
+                <label id="label-exibir-senha" for="exibir">Exibir Senha</label>
+            </div>
             <div class="executar">
                 <button type="submit">Entrar</button>
                 <a id="cadastrar" href="/cadastro">Não Tenho Conta</a>
@@ -66,6 +71,19 @@
             }
 
             window.location.href = "./cadastro.html";
+        });
+    </script>
+
+    <!-- script para exibir senha -->
+    <script>
+        const checkboxExibir = document.getElementById('exibir');
+        const CampoSenha = document.getElementById('senha');
+        checkboxExibir.addEventListener('change', function () {
+            if (checkboxExibir.checked) {
+                CampoSenha.type = 'text'
+            } else {
+                CampoSenha.type = 'password'
+            }
         });
     </script>
 
