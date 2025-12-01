@@ -166,6 +166,11 @@ header {
     -webkit-tap-highlight-color: transparent;
 }
 
+#a-logout {
+    color: #FAF2E1;
+    text-decoration: none;
+}
+
 .botao-sair:hover {
     box-shadow: 0 0 10px #40954d;
 }
