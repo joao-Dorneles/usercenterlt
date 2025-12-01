@@ -18,34 +18,32 @@
     </header>
 
     <div class="minhas-infos">
-        <h3 class="text-minhas-infos">Minhas Informações</h3>
+        <h3 class="text-minhas-infos">Olá {{ user.nome }}</h3>
         <div class="cartao-infos">
             <div class="indice">
                 <ul class="ul-indice">
                     <li class="nomes-indice">Email</li>
                     <li class="nomes-indice">Nome</li>
-                    <li class="nomes-indice">Senha</li>
                     <li class="nomes-indice">Cpf</li>
                 </ul>
             </div>
             <div class="infos">
                 <ul class="ul-infos">
-                    <li class="dados">exemplo@gmail.com <button id="botao-editar-email" class="botao-editar"><img
+                    <li class="dados">{{ user.email }}<button id="botao-editar-email" class="botao-editar"><img
                                 class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button></li>
-                    <li class="dados">exemplo da silva <button id="botao-editar-nome" class="botao-editar"><img
+                    <li class="dados">{{ user.nome }}<button id="botao-editar-nome" class="botao-editar"><img
                                 class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button>
                     </li>
-                    <li class="dados">12345 <button id="botao-editar-senha" class="botao-editar"><img class="img-editar"
-                                src="../static/images/icons/edit.png" alt="editar"></button>
-                    </li>
-                    <li class="dados">123.456.789-10 <button id="botao-editar-cpf" class="botao-editar"><img
+                    <li class="dados">{{ user.cpf }}<button id="botao-editar-cpf" class="botao-editar"><img
                                 class="img-editar" src="../static/images/icons/edit.png" alt="editar"></button>
                     </li>
                 </ul>
             </div>
         </div>
-
-        <button class="botao-excluir">Excluir Conta</button>
+        <div class="b-acao">
+            <button class="botao-excluir">Excluir Conta</button>
+            <button class="botao-sair" href="/logout">Sair da Conta</button>
+        </div>
     </div>
 
     <div class="editar" id="editar-email">
@@ -137,19 +135,13 @@
                 editar.style.display = "flex"
             });
 
-        document.getElementById("botao-editar-senha")
-            .addEventListener("click", () => {
-                const editar =
-                    document.getElementById("editar-senha");
-                editar.style.display = "flex"
-            });
-
         document.getElementById("botao-editar-cpf")
             .addEventListener("click", () => {
                 const editar =
                     document.getElementById("editar-cpf");
                 editar.style.display = "flex"
             });
+
         document.querySelectorAll(".cancelar").forEach(botao => {
             botao.addEventListener("click", (e) => {
                 e.target.closest(".editar").style.display = "none";

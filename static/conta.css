@@ -152,6 +152,24 @@ header {
     -webkit-tap-highlight-color: transparent;
 }
 
+.botao-sair {
+    margin-top: 1rem;
+    background-color: #40954d;
+    border-radius: 30px;
+    border: 0;
+    padding: 1rem;
+    color: #FAF2E1;
+    font-family: "InkNutAntiqua", serif;
+    cursor: pointer;
+    transition: 0.5s;
+    z-index: 1000;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.botao-sair:hover {
+    box-shadow: 0 0 10px #40954d;
+}
+
 .botao-excluir:hover {
     box-shadow: 0 0 10px #D83737;
 }
@@ -170,7 +188,7 @@ header {
 }
 
 .excluir {
-    display: flex;
+    display: none;
     flex-direction: column;
     position: absolute;
     justify-content: center;
@@ -312,6 +330,12 @@ input::placeholder {
 
 .cancelar:hover {
     box-shadow: 0 0 10px #D83737;
+}
+
+.b-acao {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
 }
 
 .waves {
@@ -472,9 +496,15 @@ input::placeholder {
     }
 
     .botao-excluir {
-        width: 15rem;
-        height: 7rem;
-        font-size: 1.4rem;
+        width: 13rem;
+        height: 5rem;
+        font-size: 1.2rem;
+    }
+
+    .botao-sair {
+        width: 13rem;
+        height: 5rem;
+        font-size: 1.2rem;
     }
 
     .botao-editar {
