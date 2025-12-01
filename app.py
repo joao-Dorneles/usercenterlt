@@ -102,7 +102,7 @@ def snake():
 def conta():
     user_id = session.get('user_id')
     user = usuarios.query.get_or_404(user_id)
-    return render_template("conta.html")
+    return render_template("conta.html", user=user)
 
 @app.route("/logout")
 def logout():
