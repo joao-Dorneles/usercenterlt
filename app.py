@@ -51,7 +51,8 @@ def cadastro():
         senha = request.form['senha']
         cpf = request.form['cpf']
 
-        novo_usuario = usuarios(nome=nome, email=email, cpf=cpf, senha=senha)
+        novo_usuario = usuarios(nome=nome, email=email, cpf=cpf)
+        novo_usuario.set_senha(senha)
         db.session.add(novo_usuario)
         db.session.commit()
         return "Esta cadastrado"    
