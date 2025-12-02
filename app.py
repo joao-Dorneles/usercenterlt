@@ -47,6 +47,10 @@ class usuarios(db.Model):
     email = db.Column(db.String(150))
     cpf = db.Column(db.String(14))
     senha_hash = db.Column(db.String(255), nullable=False)
+    score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
+    score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
+    total_score = db.Column(db.Integer, default=0, nullable=False)
+
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha) 
@@ -239,7 +243,7 @@ def dash_score():
     """Rota para receber e salvar a pontuação do Delivery Dash."""
     data = request.get_json()
     novo_score = data.get("score", 0)
-    
+
     try:
         novo_score = int(novo_score)
     except (TypeError, ValueError):
@@ -250,9 +254,9 @@ def dash_score():
     if novo_score > (user.pontuacaos_dash or 0):
         user.pontuacaos_dash = novo_score
         db.session.commit()
-        return {"status": "ok", "saved_high_score": user.pontuacaos_dash}
+        return {"status": "ok", "saved_high_score": user.score_jogo1}
     
-    return {"status": "ok", "saved_high_score": user.pontuacaos_dash, "message": "Nova pontuação não é maior que a salva."}
+    return {"status": "ok", "saved_high_score": user.score_jogo1, "message": "Nova pontuação não é maior que a salva."}
 
 @app.route("/api/snake_score", methods=["POST"])
 @login_required
@@ -262,11 +266,11 @@ def snake_score():
 
     user = usuarios.query.get(session["user_id"])
 
-    if novo_score > (user.pontuacao_snake or 0):
-        user.pontuacao_snake = novo_score
+    if novo_score > (user.score_jogo2 or 0):
+        user.score_jogo2 = novo_score
         db.session.commit()
 
-    return {"status": "ok", "saved_high_score": user.pontuacao_snake}
+    return {"status": "ok", "saved_high_score": user.score_jogo2}
 
 
 @app.route("/test-smtp")
