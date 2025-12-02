@@ -233,6 +233,42 @@ def reset_token(token):
             return render_template('redefinir.html', token=token) 
     return render_template('redefinir.html', token=token)
 
+@app.route("/api/dash_score", methods=["POST"])
+@login_required
+def dash_score():
+    """Rota para receber e salvar a pontuação do Delivery Dash."""
+    data = request.get_json()
+    novo_score = data.get("score", 0)
+    
+    try:
+        novo_score = int(novo_score)
+    except (TypeError, ValueError):
+        return {"status": "error", "message": "Pontuação inválida"}, 400
+
+    user = usuarios.query.get(session["user_id"])
+
+    if novo_score > (user.pontuacaos_dash or 0):
+        user.pontuacaos_dash = novo_score
+        db.session.commit()
+        return {"status": "ok", "saved_high_score": user.pontuacaos_dash}
+    
+    return {"status": "ok", "saved_high_score": user.pontuacaos_dash, "message": "Nova pontuação não é maior que a salva."}
+
+@app.route("/api/snake_score", methods=["POST"])
+@login_required
+def snake_score():
+    data = request.get_json()
+    novo_score = data.get("score", 0)
+
+    user = usuarios.query.get(session["user_id"])
+
+    if novo_score > (user.pontuacao_snake or 0):
+        user.pontuacao_snake = novo_score
+        db.session.commit()
+
+    return {"status": "ok", "saved_high_score": user.pontuacao_snake}
+
+
 @app.route("/test-smtp")
 def test_smtp():
     server = app.config.get("MAIL_SERVER")
