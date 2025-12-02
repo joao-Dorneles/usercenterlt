@@ -49,6 +49,7 @@ class usuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
     score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
+    total_score = db.Column(db.Integer, default=0, nullable=False)
 
 
 
@@ -240,7 +241,6 @@ def reset_token(token):
 @app.route("/api/dash_score", methods=["POST"])
 @login_required
 def dash_score():
-    """Rota para receber e salvar a pontuação do Delivery Dash."""
     data = request.get_json()
     novo_score = data.get("score", 0)
 
@@ -253,8 +253,10 @@ def dash_score():
 
     if novo_score > (user.score_jogo1 or 0):
         user.score_jogo1 = novo_score
+        user.total_score = (user.score_jogo1 or 0) + (user.score_jogo2 or 0)
+        
         db.session.commit()
-        return {"status": "ok", "saved_high_score": user.score_jogo1}
+        return {"status": "ok", "saved_high_score": user.score_jogo1, "message": "Novo recorde salvo!"}
     
     return {"status": "ok", "saved_high_score": user.score_jogo1, "message": "Nova pontuação não é maior que a salva."}
 
@@ -263,15 +265,29 @@ def dash_score():
 def snake_score():
     data = request.get_json()
     novo_score = data.get("score", 0)
+    
+    try:
+        novo_score = int(novo_score)
+    except (TypeError, ValueError):
+        return {"status": "error", "message": "Pontuação inválida"}, 400
 
     user = usuarios.query.get(session["user_id"])
 
     if novo_score > (user.score_jogo2 or 0):
         user.score_jogo2 = novo_score
+        user.total_score = (user.score_jogo1 or 0) + (user.score_jogo2 or 0)
+        
         db.session.commit()
+        return {"status": "ok", "saved_high_score": user.score_jogo2, "message": "Novo recorde salvo!"}
 
-    return {"status": "ok", "saved_high_score": user.score_jogo2}
+    return {"status": "ok", "saved_high_score": user.score_jogo2, "message": "Nova pontuação não é maior que a salva."}
 
+@app.route("/ranking")
+def ranking():
+    # Busca os 15 melhores usuários ordenados pelo total_score (pontuação total)
+    top_scores = usuarios.query.order_by(usuarios.total_score.desc()).limit(15).all()
+    # Envia essa lista de objetos (top_scores) para o template
+    return render_template("ranking.html", ranking_data=top_scores)
 
 @app.route("/test-smtp")
 def test_smtp():

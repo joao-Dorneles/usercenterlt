@@ -55,83 +55,16 @@
                     <th class="th-topo">Pontos</th>
                 </tr>
             </thead>
-
             <tbody>
-                <tr class="destaque">
-                    <td>1</td>
-                    <td>Fulano</td>
-                    <td>9999</td>
+                {% for user in ranking_data %}
+
+                <tr class="{% if loop.index % 2 == 1 %}destaque{% endif %}">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ user.nome }}</td>
+                    <td>{{ user.total_score }}</td>
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Trump</td>
-                    <td>789</td>
-                </tr>
-                <tr class="destaque">
-                    <td>3</td>
-                    <td>Alan</td>
-                    <td>689</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Robson</td>
-                    <td>567</td>
-                </tr>
-                <tr class="destaque">
-                    <td>5</td>
-                    <td>Cicrano</td>
-                    <td>456</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>Beltrano</td>
-                    <td>345</td>
-                </tr>
-                <tr class="destaque">
-                    <td>7</td>
-                    <td>Marciano</td>
-                    <td>123</td>
-                </tr>
-                <tr>
-                    <td>8</td>
-                    <td>Silvio Santos</td>
-                    <td>100</td>
-                </tr>
-                <tr class="destaque">
-                    <td>9</td>
-                    <td>Snoop</td>
-                    <td>96</td>
-                </tr>
-                <tr>
-                    <td>10</td>
-                    <td>Sara</td>
-                    <td>56</td>
-                </tr>
-                <tr class="destaque">
-                    <td>11</td>
-                    <td>Luffy</td>
-                    <td>43</td>
-                </tr>
-                <tr>
-                    <td>12</td>
-                    <td>Bolsonaro</td>
-                    <td>32</td>
-                </tr>
-                <tr class="destaque">
-                    <td>13</td>
-                    <td>Lula</td>
-                    <td>30</td>
-                </tr>
-                <tr>
-                    <td>14</td>
-                    <td>Putin</td>
-                    <td>25</td>
-                </tr>
-                <tr class="destaque">
-                    <td>15</td>
-                    <td>Neymar</td>
-                    <td>17</td>
-                </tr>
+
+                {% endfor %}
             </tbody>
         </table>
 
