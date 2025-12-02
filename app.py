@@ -9,6 +9,8 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 import smtplib
 from flask import jsonify
+import requests
+import socket
 
 load_dotenv()
 
@@ -25,6 +27,9 @@ if database_url:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_recycle": 1800,}
 db = SQLAlchemy(app)
+
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "noreply@isso-nao-deve-ser-usado.com"))
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -68,20 +73,45 @@ def email_recuperar(user):
     token = user.get_reset_token()
     reset_url = url_for('reset_token', token=token, _external=True)
 
-    msg = Message('Redefinição de Senha', recipients=[user.email])
-    msg.body = f"""Olá {user.nome or ''},
+    subject = "Redefinição de Senha"
+    body = f"""Olá {user.nome or ''},
 
-Para redefinir sua senha, clique no link abaixo:
-{reset_url}
+    Para redefinir sua senha, clique no link abaixo:
+    {reset_url}
 
-Se você não solicitou, ignore este e-mail. O link expira em 30 minutos (ou conforme configurado).
-"""
+    Se você não solicitou, ignore este e-mail.
+    """
     try:
-        app.logger.debug(f"Enviando e-mail de recuperação para {user.email} (reset_url={reset_url})")
+        msg = Message(subject, recipients=[user.email])
+        msg.body = body
         mail.send(msg)
-        app.logger.info(f"E-mail de recuperação enviado para: {user.email}")
+        return True
     except Exception as e:
-        app.logger.error("ERRO AO ENVIAR E-MAIL: %s", e, exc_info=True)
+        app.logger.error(f"SMTP falhou. Tentando SendGrid. Erro: {e}")
+
+    try:
+        import requests
+        sg_key = os.getenv("SENDGRID_API_KEY")
+        if not sg_key:
+            return False
+        
+        data = {
+            "personalizations": [{"to": [{"email": user.email}]}],
+            "from": {"email": os.getenv("MAIL_DEFAULT_SENDER")},
+            "subject": subject,
+            "content": [{"type": "text/plain", "value": body}]
+        }
+
+        r = requests.post(
+            "https://api.sendgrid.com/v3/mail/send",
+            json=data,
+            headers={"Authorization": f"Bearer {sg_key}"}
+        )
+
+        return r.status_code in (200, 202)
+
+    except Exception as e:
+        app.logger.error(f"SendGrid falhou também: {e}")
         return False
     
 def login_required(f):
