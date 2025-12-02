@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Recuperar Senha</title>
     <link rel="stylesheet" href="../static/style.css">
     <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
 </head>
@@ -12,27 +12,16 @@
 <body>
 
     <header>
-        <a href="https://linhadotempo.onrender.com"><img class="img-header" id="seta-voltar"
-                src="../static/images/icons/seta-esquerda.png"></a>
         <img class="img-header" id="logo" src="../static/images/general/logoNOBG.png">
     </header>
 
     <div class="formulario">
-        <h2>Entrar</h2>
-        <form id="login-form" method="post" action="/">
+        <h2>Redefinição</h2>
+        <form id="login-form" method="post" action="/recuperar">
             <label for="email">E-mail</label>
             <input id="email" type="email" name="email" required placeholder="Insira seu email">
-
-            <label for="senha">Senha</label>
-            <input id="senha" type="password" name="senha" required placeholder="Insira sua senha">
-            <div id="exibir-senha">
-                <input id="exibir" type="checkbox">
-                <label id="label-exibir-senha" for="exibir">Exibir Senha</label>
-            </div>
             <div class="executar">
-                <button type="submit">Entrar</button>
-                <a id="cadastrar" href="/cadastro">Não Tenho Conta</a>
-                <a id="recuperar-senha" href="/recuperar">Esqueci Minha Senha</a>
+                <button type="submit">Redefinir</button>
             </div>
         </form>
     </div>
@@ -62,28 +51,7 @@
         const form = document.getElementById('login-form');
         form.addEventListener('submit', function (event) {
             event.preventDefault(); // sempre bloqueia primeiro
-
-            const senha = document.getElementById('senha').value.trim();
-
-            if (senha.length < 6 || senha.length > 8) {
-                alert('A senha deve ter entre 6 e 8 caracteres.');
-                return;
-            }
-
             form.submit();
-        });
-    </script>
-
-    <!-- script para exibir senha -->
-    <script>
-        const checkboxExibir = document.getElementById('exibir');
-        const CampoSenha = document.getElementById('senha');
-        checkboxExibir.addEventListener('change', function () {
-            if (checkboxExibir.checked) {
-                CampoSenha.type = 'text'
-            } else {
-                CampoSenha.type = 'password'
-            }
         });
     </script>
 

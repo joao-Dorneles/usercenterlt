@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer as Serializer 
+from itsdangerous import URLSafeTimedSerializer
+from sqlalchemy.exc import IntegrityError
 
 load_dotenv()
 
@@ -22,6 +26,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_recycle": 1800,}
 db = SQLAlchemy(app)
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True 
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_DEBUG'] = True
+mail = Mail(app)
+
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
@@ -34,6 +47,42 @@ class usuarios(db.Model):
 
     def check_senha(self, senha):
         return check_password_hash(self.senha_hash, senha)
+    
+    def get_reset_token(self, expires_sec=1800):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        return s.dumps({'user_id': self.id}, salt='recover-key')
+
+    @staticmethod
+    def verify_reset_token(token, max_age=1800):
+        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token, salt='recover-key', max_age=max_age)
+            user_id = data.get('user_id')
+        except Exception as e:
+            app.logger.debug(f"verify_reset_token failed: {e}")
+            return None
+        return usuarios.query.get(user_id)
+    
+def email_recuperar(user):
+    token = user.get_reset_token()
+    reset_url = url_for('reset_token', token=token, _external=True)
+
+    msg = Message('Redefinição de Senha', recipients=[user.email])
+    msg.body = f"""Olá {user.nome or ''},
+
+Para redefinir sua senha, clique no link abaixo:
+{reset_url}
+
+Se você não solicitou, ignore este e-mail. O link expira em 30 minutos (ou conforme configurado).
+"""
+    try:
+        app.logger.debug(f"Enviando e-mail de recuperação para {user.email} (reset_url={reset_url})")
+        mail.send(msg)
+        app.logger.info(f"E-mail de recuperação enviado para: {user.email}")
+    except Exception as e:
+        app.logger.exception("ERRO AO ENVIAR E-MAIL:")
+        flash("Falha ao enviar e-mail de redefinição. Tente novamente mais tarde.", "danger")
+        raise 
     
 def login_required(f):
     @wraps(f)
@@ -66,14 +115,13 @@ def index():
 def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
-        email = request.form['email']
+        email = request.form['email'].strip().lower()
         senha = request.form['senha']
         cpf = request.form['cpf']
 
         novo_usuario = usuarios(nome=nome, email=email, cpf=cpf)
         novo_usuario.set_senha(senha)
         db.session.add(novo_usuario)
-        db.session.commit()
         try:
             db.session.commit()
             flash("Cadastro realizado com sucesso! Faça login.", "success")
@@ -81,7 +129,7 @@ def cadastro():
         except IntegrityError:
             db.session.rollback()
             flash("Erro: Email ou CPF já cadastrado.", "danger")
-            return render_template("cadastro.html") 
+            return render_template("cadastro.html")
     return render_template("cadastro.html")
 
 @app.route("/hubjogos")
@@ -109,6 +157,51 @@ def logout():
     session.pop('user_id', None)
     flash("Você saiu da conta com sucesso.", "info")
     return redirect(url_for("index"))
+
+@app.route("/recuperar", methods=['GET', 'POST'])
+def recuperar():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        user = usuarios.query.filter_by(email=email).first()
+        if user:
+            try:
+                email_recuperar(user) 
+                flash("Um e-mail foi enviado com instruções para redefinir sua senha.", "info")
+            except Exception as e:
+                print(f"ERRO DE ENVIO DE E-MAIL (GERAL): {e}") 
+                flash("Falha interna ao enviar e-mail. Verifique suas credenciais no .env.", "danger")
+            return redirect(url_for('index'))
+        else:
+            flash("Se a sua conta existir, um e-mail com instruções foi enviado.", "warning")
+            return redirect(url_for('index'))
+            
+    return render_template("recuperar.html")
+
+@app.route("/reset_senha/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    user = usuarios.verify_reset_token(token)
+    if user is None:
+        flash("Token inválido ou expirado.", "warning")
+        return redirect(url_for('recuperar'))
+    
+    if request.method == 'POST':
+        nova_senha = request.form['nova_senha'] 
+
+        try:
+            user.set_senha(nova_senha)
+            db.session.commit()
+            
+            flash("Sua senha foi atualizada com sucesso!", "success")
+            return redirect(url_for('index'))
+            
+        except Exception as e:
+            db.session.rollback() 
+            print("-" * 50)
+            print(f"ERRO FATAL AO SALVAR SENHA NO BD: {e}") 
+            print("-" * 50)
+            flash("Ocorreu um erro ao atualizar a senha. Tente novamente mais tarde.", "danger")
+            return render_template('redefinir.html', token=token) 
+    return render_template('redefinir.html', token=token)
 
 if __name__ == "__main__":
     with app.app_context():
