@@ -49,7 +49,7 @@ class usuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
     score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
-    total_score = db.Column(db.Integer, default=0, nullable=False)
+
 
 
     def set_senha(self, senha):
@@ -251,8 +251,8 @@ def dash_score():
 
     user = usuarios.query.get(session["user_id"])
 
-    if novo_score > (user.pontuacaos_dash or 0):
-        user.pontuacaos_dash = novo_score
+    if novo_score > (user.score_jogo1 or 0):
+        user.score_jogo1 = novo_score
         db.session.commit()
         return {"status": "ok", "saved_high_score": user.score_jogo1}
     
