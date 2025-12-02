@@ -94,7 +94,7 @@ def email_recuperar(user):
         sg_key = os.getenv("SENDGRID_API_KEY")
         if not sg_key:
             return False
-        
+        #teste
         data = {
             "personalizations": [{"to": [{"email": user.email}]}],
             "from": {"email": os.getenv("MAIL_DEFAULT_SENDER")},
