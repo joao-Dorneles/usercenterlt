@@ -257,6 +257,40 @@ def test_smtp():
     except Exception as e:
         app.logger.exception("SMTP test failed")
         return jsonify({"ok": False, "error": str(e)}), 500
+    
+
+@app.route("/diag-dns")
+def diag_dns():
+    try:
+        ip = socket.gethostbyname("smtp.gmail.com")
+        return jsonify({"ok": True, "smtp.gmail.com": ip})
+    except Exception as e:
+        return jsonify({"ok": False, "error": f"DNS fail: {e}"}), 500
+
+@app.route("/diag-conn")
+def diag_conn():
+    results = {}
+    try:
+        s = socket.create_connection(("smtp.gmail.com", 465), timeout=8)
+        s.close()
+        results["smtp_465"] = "ok"
+    except Exception as e:
+        results["smtp_465"] = f"fail: {e}"
+
+    try:
+        s = socket.create_connection(("api.sendgrid.com", 443), timeout=8)
+        s.close()
+        results["sendgrid_443"] = "ok"
+    except Exception as e:
+        results["sendgrid_443"] = f"fail: {e}"
+
+    try:
+        r = requests.get("https://api.sendgrid.com/v3/user/account", timeout=8)
+        results["http_sendgrid"] = {"status": r.status_code, "text_snippet": r.text[:200]}
+    except Exception as e:
+        results["http_sendgrid"] = f"fail: {e}"
+
+    return jsonify(results)
 
 if __name__ == "__main__":
     with app.app_context():
