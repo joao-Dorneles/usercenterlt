@@ -11,7 +11,7 @@ import smtplib
 from flask import jsonify
 import requests
 import socket
-
+#versao falha do sendgrid
 load_dotenv()
 
 app = Flask(__name__)
@@ -90,11 +90,9 @@ def email_recuperar(user):
         app.logger.error(f"SMTP falhou. Tentando SendGrid. Erro: {e}")
 
     try:
-        import requests
         sg_key = os.getenv("SENDGRID_API_KEY")
         if not sg_key:
             return False
-        #teste
         data = {
             "personalizations": [{"to": [{"email": user.email}]}],
             "from": {"email": os.getenv("MAIL_DEFAULT_SENDER")},
