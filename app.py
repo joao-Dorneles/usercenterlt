@@ -7,7 +7,8 @@ from functools import wraps
 from sqlalchemy.exc import IntegrityError
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-
+import smtplib
+from flask import jsonify
 
 load_dotenv()
 
@@ -80,9 +81,8 @@ Se você não solicitou, ignore este e-mail. O link expira em 30 minutos (ou con
         mail.send(msg)
         app.logger.info(f"E-mail de recuperação enviado para: {user.email}")
     except Exception as e:
-        app.logger.exception("ERRO AO ENVIAR E-MAIL:")
-        flash("Falha ao enviar e-mail de redefinição. Tente novamente mais tarde.", "danger")
-        raise 
+        app.logger.error("ERRO AO ENVIAR E-MAIL: %s", e, exc_info=True)
+        return False
     
 def login_required(f):
     @wraps(f)
@@ -93,6 +93,10 @@ def login_required(f):
             return redirect(url_for('index', next=next_url))
         return f(*args, **kwargs)
     return decorated_function    
+
+#pra que tantos codigos...
+#se a vida não é programada...
+#e as melhores coisas não tem logica?
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -164,17 +168,15 @@ def recuperar():
         email = request.form.get('email', '').strip().lower()
         user = usuarios.query.filter_by(email=email).first()
         if user:
-            try:
-                email_recuperar(user) 
+            ok = email_recuperar(user)
+            if ok:
                 flash("Um e-mail foi enviado com instruções para redefinir sua senha.", "info")
-            except Exception as e:
-                print(f"ERRO DE ENVIO DE E-MAIL (GERAL): {e}") 
-                flash("Falha interna ao enviar e-mail. Verifique suas credenciais no .env.", "danger")
+            else:
+                flash("Falha ao enviar o e-mail de recuperação. Tente novamente mais tarde.", "danger")
             return redirect(url_for('index'))
         else:
             flash("Se a sua conta existir, um e-mail com instruções foi enviado.", "warning")
             return redirect(url_for('index'))
-            
     return render_template("recuperar.html")
 
 @app.route("/reset_senha/<token>", methods=['GET', 'POST'])
@@ -202,6 +204,29 @@ def reset_token(token):
             flash("Ocorreu um erro ao atualizar a senha. Tente novamente mais tarde.", "danger")
             return render_template('redefinir.html', token=token) 
     return render_template('redefinir.html', token=token)
+
+@app.route("/test-smtp")
+def test_smtp():
+    server = app.config.get("MAIL_SERVER")
+    port = int(app.config.get("MAIL_PORT", 0) or 0)
+    use_ssl = bool(app.config.get("MAIL_USE_SSL"))
+    use_tls = bool(app.config.get("MAIL_USE_TLS"))
+    user = app.config.get("MAIL_USERNAME")
+
+    try:
+        if use_ssl or port == 465:
+            s = smtplib.SMTP_SSL(server, port, timeout=10)
+        else:
+            s = smtplib.SMTP(server, port, timeout=10)
+            if use_tls or port == 587:
+                s.starttls()
+        if user:
+            s.login(user, app.config.get("MAIL_PASSWORD"))
+        s.quit()
+        return jsonify({"ok": True, "msg": "SMTP OK", "server": server, "port": port, "ssl": use_ssl, "tls": use_tls})
+    except Exception as e:
+        app.logger.exception("SMTP test failed")
+        return jsonify({"ok": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
     with app.app_context():
