@@ -7,7 +7,6 @@
     <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap');
 
@@ -156,7 +155,6 @@
 </head>
 
 <body>
-
     <div class="wrapper">
         <div class="game-details">
             <span class="score">Pontuação: 0</span>
@@ -183,7 +181,7 @@
         const highScoreElement = document.querySelector(".high-score");
         const controls = document.querySelectorAll(".controls i");
 
-        // Audio
+        // Audio  
         const bgm = document.getElementById("bgm");
         const eatSfx = document.getElementById("eatSfx");
         const deathSfx = document.getElementById("deathSfx");
@@ -194,7 +192,7 @@
             if (audioEnabled) return;
             audioEnabled = true;
 
-            // tenta tocar música de fundo
+            // tenta tocar música de fundo  
             bgm.volume = 0.50;
             bgm.play().catch(() => { });
 
@@ -205,7 +203,7 @@
         window.addEventListener("keydown", enableAudioOnInteraction);
         window.addEventListener("click", enableAudioOnInteraction);
 
-        // função para tocar efeitos
+        // função para tocar efeitos  
         function playSfx(audioEl, volume = 1) {
             const clone = audioEl.cloneNode(true);
             clone.volume = volume;
@@ -221,7 +219,7 @@
         let score = 0;
 
         let highScore = parseInt(localStorage.getItem("high-score")) || 0;
-        highScoreElement.innerText = `Melhor: ${highScore}`;
+        highScoreElement.innerText = `Melhor: ${ highScore }`;
 
         const updateFoodPosition = () => {
             foodX = Math.floor(Math.random() * 30) + 1;
@@ -232,6 +230,16 @@
             clearInterval(setIntervalId);
 
             playSfx(deathSfx);
+
+            // Envia pontuação para o backend
+            fetch("/api/snake_score", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ score: score })
+            })
+                .then(res => res.json())
+                .then(data => console.log("Pontuação salva:", data))
+                .catch(err => console.error("Erro ao salvar pontuação:", err));
 
             setTimeout(() => {
                 alert("Fim de Jogo! Pressione OK para recomeçar...");
@@ -260,7 +268,7 @@
         const initGame = () => {
             if (gameOver) return handleGameOver();
 
-            let html = `<div class="food" style="grid-area: ${foodY} / ${foodX}"></div>`;
+            let html = <div class="food" style="grid-area: ${foodY} / ${foodX}"></div>;
 
             if (snakeX === foodX && snakeY === foodY) {
                 updateFoodPosition();
@@ -270,8 +278,8 @@
                 highScore = score >= highScore ? score : highScore;
                 localStorage.setItem("high-score", highScore);
 
-                scoreElement.innerText = `Pontuação: ${score}`;
-                highScoreElement.innerText = `Melhor: ${highScore}`;
+                scoreElement.innerText = `Pontuação: ${ score }`;
+                highScoreElement.innerText = `Melhor: ${ highScore }`;
 
                 playSfx(eatSfx, 0.9);
             }
@@ -289,7 +297,7 @@
                 return gameOver = true;
 
             for (let i = 0; i < snakeBody.length; i++) {
-                html += `<div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>`;
+                html += <div class="head" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}"></div>;
                 if (i !== 0 &&
                     snakeBody[0][1] === snakeBody[i][1] &&
                     snakeBody[0][0] === snakeBody[i][0]) {
@@ -302,8 +310,9 @@
 
         updateFoodPosition();
         setIntervalId = setInterval(initGame, 100);
-        document.addEventListener("keyup", changeDirection);
+        document.addEventListener("keyup", changeDirection);  
     </script>
+
 </body>
 
 </html>
