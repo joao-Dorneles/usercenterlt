@@ -60,7 +60,7 @@
                 <tr class="{% if loop.index % 2 == 1 %}destaque{% endif %}">
                     <td>{{ loop.index }}</td>
                     <td {% if user.id == user_logado_id %}class="seu-usuario"{% endif %}>{{ user.nome }}</td>
-                    <td>{{ user.score_jogo1 }}</td>
+                    <td>{{ user.total_score }}</td>
                 </tr>
                 {% else %}
                 <tr>

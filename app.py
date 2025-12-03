@@ -39,7 +39,7 @@ class usuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
     score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
-    # total_score = db.Column(db.Integer, default=0, nullable=False) ainda não existe
+    total_score = db.Column(db.Integer, default=0, nullable=False)
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha) 
@@ -228,12 +228,19 @@ def hubjogos():
     return render_template("hubjogos.html", ranking_data=ranking_data, user_logado_id=user_logado_id)
 
 @app.route("/deliverydash")
+@login_required
 def deliverydash():
-    return render_template("deliverydash.html")
+    user = usuarios.query.get(session["user_id"])
+    initial_high_score = user.score_jogo1 or 0
+    return render_template("deliverydash.html", initial_high_score=initial_high_score)
 
 @app.route("/snake")
+@login_required
 def snake():
-    return render_template("snake.html")
+    user = usuarios.query.get(session["user_id"])
+    initial_high_score = user.score_jogo2 or 0 
+    
+    return render_template("snake.html", initial_high_score=initial_high_score)
 
 @app.route("/conta", methods=['GET', 'POST'])
 @login_required
@@ -345,12 +352,32 @@ def dash_score():
         return {"status": "error", "message": "Pontuação inválida"}, 400
 
     user = usuarios.query.get(session["user_id"])
-    if novo_score > (user.score_jogo1 or 0):
-        user.score_jogo1 = novo_score
-        db.session.commit() 
-        return {"status": "ok", "saved_high_score": user.score_jogo1}
     
-    return {"status": "ok", "saved_high_score": user.score_jogo1, "message": "Nova pontuação não é maior que a salva."}
+    record_atual_jogo1 = user.score_jogo1 or 0
+    record_atual_jogo2 = user.score_jogo2 or 0 
+    
+    saved_high_score = record_atual_jogo1
+    
+    if novo_score > record_atual_jogo1:
+        user.score_jogo1 = novo_score
+        saved_high_score = novo_score
+
+        user.total_score = user.score_jogo1 + record_atual_jogo2
+        
+        db.session.commit() 
+        return {
+            "status": "ok", 
+            "saved_high_score": user.score_jogo1,
+            "total_score": user.total_score,
+            "message": "Novo recorde do Jogo 1 e total score combinado atualizados."
+        }
+    
+    return {
+        "status": "ok", 
+        "saved_high_score": saved_high_score,
+        "total_score": user.total_score,
+        "message": "Nova pontuação não é maior que o recorde. Total Score inalterado."
+    }
 
 @app.route("/api/snake_score", methods=["POST"])
 @login_required
@@ -358,13 +385,39 @@ def snake_score():
     data = request.get_json()
     novo_score = data.get("score", 0)
 
+    try:
+        novo_score = int(novo_score)
+    except (TypeError, ValueError):
+        return {"status": "error", "message": "Pontuação inválida"}, 400
+
     user = usuarios.query.get(session["user_id"])
 
-    if novo_score > (user.score_jogo2 or 0):
+    record_atual_jogo2 = user.score_jogo2 or 0
+    record_atual_jogo1 = user.score_jogo1 or 0
+    
+    saved_high_score = record_atual_jogo2
+
+    if novo_score > record_atual_jogo2:
         user.score_jogo2 = novo_score
+        saved_high_score = novo_score
+        
+        user.total_score = user.score_jogo2 + record_atual_jogo1
+        
         db.session.commit()
 
-    return {"status": "ok", "saved_high_score": user.score_jogo2}
+        return {
+            "status": "ok", 
+            "saved_high_score": user.score_jogo2,
+            "total_score": user.total_score,
+            "message": "Novo recorde do Jogo 2 e total score combinado atualizados."
+        }
+
+    return {
+        "status": "ok", 
+        "saved_high_score": saved_high_score,
+        "total_score": user.total_score,
+        "message": "Nova pontuação não é maior que o recorde. Total Score inalterado."
+    }
 
 
 # essa rota é responsavel pela exclusao, ou seja, é critica [!]

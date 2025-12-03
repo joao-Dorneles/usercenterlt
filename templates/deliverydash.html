@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,8 @@
     <style>
         /* Estilos específicos do jogo */
         body {
-            background-color: #111827; /* Fundo cinza escuro */
+            background-color: #111827;
+            /* Fundo cinza escuro */
             color: #f3f4f6;
             font-family: 'Inter', sans-serif;
             display: flex;
@@ -25,7 +27,8 @@
             border-radius: 12px;
             overflow: hidden;
             margin-bottom: 20px;
-            max-width: 480px; /* Limita a largura máxima do canvas */
+            max-width: 480px;
+            /* Limita a largura máxima do canvas */
             width: 100%;
         }
 
@@ -33,7 +36,8 @@
             display: block;
             background-color: #000;
             width: 100%;
-            height: 550px; /* Altura fixa para o jogo de estrada */
+            height: 550px;
+            /* Altura fixa para o jogo de estrada */
         }
 
         #hud {
@@ -48,7 +52,7 @@
             margin-bottom: 15px;
             border: 2px solid #00ff99;
         }
-        
+
         #hud span {
             font-weight: bold;
             color: #00ff99;
@@ -68,7 +72,8 @@
             text-align: center;
             font-weight: bold;
             z-index: 1000;
-            display: none; /* Inicialmente oculto */
+            display: none;
+            /* Inicialmente oculto */
         }
 
         #gameOver small {
@@ -77,7 +82,7 @@
             font-size: 1rem;
             color: #ccc;
         }
-        
+
         #countdown {
             position: absolute;
             top: 50%;
@@ -87,12 +92,12 @@
             color: #00ff99;
             z-index: 1001;
         }
-        
+
         #controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            max-width: 200px; /* Limita o tamanho do controle */
+            max-width: 200px;
             margin-top: 20px;
         }
 
@@ -130,529 +135,523 @@
             line-height: 1;
             z-index: 50;
         }
+
+        @media(min-width: 1025px) {
+            #controls {
+                display: none;
+            }
+        }
     </style>
 </head>
+
 <body class="p-4 flex flex-col items-center min-h-screen">
 
-<!-- MUSICA DE FUNDO -->  
-<audio id="bgMusic" loop muted>  
-    <!-- Assumindo que o caminho estático está correto no ambiente Flask -->
-    <source src="../static/audio/Helios.mp3" type="audio/mpeg">  
-</audio>  
+    <!-- MUSICA DE FUNDO -->
+    <audio id="bgMusic" loop muted>
+        <!-- Assumindo que o caminho estático está correto no ambiente Flask -->
+        <source src="../static/audio/Helios.mp3" type="audio/mpeg">
+    </audio>
 
-<!-- SONS DE EFEITOS -->  
-<audio id="s_hit" preload="auto"><source src="../static/audio/hit.mp3" type="audio/mpeg"></audio>  
-<audio id="s_coin" preload="auto"><source src="../static/audio/coin.mp3" type="audio/mpeg"></audio>  
-<audio id="s_magnet" preload="auto"><source src="../static/audio/magnet.mp3" type="audio/mpeg"></audio>  
-<audio id="s_heart" preload="auto"><source src="../static/audio/heart.mp3" type="audio/mpeg"></audio>  
-<audio id="s_shield" preload="auto"><source src="../static/audio/shield.mp3" type="audio/mpeg"></audio>  
-<audio id="s_gameover" preload="auto"><source src="../static/audio/gameover.mp3" type="audio/mpeg"></audio>  
-<audio id="s_start" preload="auto"><source src="../static/audio/start.mp3" type="audio/mpeg"></audio>  
+    <!-- SONS DE EFEITOS -->
+    <audio id="s_hit" preload="auto">
+        <source src="../static/audio/hit.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_coin" preload="auto">
+        <source src="../static/audio/coin.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_magnet" preload="auto">
+        <source src="../static/audio/magnet.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_heart" preload="auto">
+        <source src="../static/audio/heart.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_shield" preload="auto">
+        <source src="../static/audio/shield.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_gameover" preload="auto">
+        <source src="../static/audio/gameover.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="s_start" preload="auto">
+        <source src="../static/audio/start.mp3" type="audio/mpeg">
+    </audio>
 
-<div id="hud">
-    <span>Velocidade: <span id="speed">0</span></span>
-    <span>Pontos: <span id="score">0</span></span>
-    <span>Vidas: <span id="lives">3</span></span>
-</div>
-
-<div id="gameWrapper">
-    <button id="pauseBtn" class="shadow-lg">⏸</button>
-    <div id="gameOver">
-        🚗 GAME OVER 🚗<br>
-        <small id="highScoreMessage" class="text-white text-base"></small>
-        <small class="mt-4 block">Pressione R ou toque para reiniciar</small>
+    <div id="hud">
+        <span>Velocidade: <span id="speed">0</span></span>
+        <span>Pontos: <span id="score">0</span></span>
+        <span>Melhor: <span id="serverHighScore">{{ initial_high_score | int }}</span></span>
+        <span>Vidas: <span id="lives">3</span></span>
     </div>
-    <div id="countdown"></div>  
-    <canvas id="gameCanvas" width="480" height="550"></canvas>
-</div>
 
-<div id="controls">  
-    <div></div>  
-    <div class="btn" data-dir="up">▲</div>  
-    <div></div>  
-    <div class="btn" data-dir="left">◀</div>  
-    <div class="btn" data-dir="down">▼</div>  
-    <div class="btn" data-dir="right">▶</div>  
-</div>  
+    <div id="gameWrapper">
+        <button id="pauseBtn" class="shadow-lg">⏸</button>
+        <div id="gameOver">
+            🚗 GAME OVER 🚗<br>
+            <small id="highScoreMessage" class="text-white text-base"></small>
+            <small class="mt-4 block">Pressione R ou toque para reiniciar</small>
+        </div>
+        <div id="countdown"></div>
+        <canvas id="gameCanvas" width="480" height="550"></canvas>
+    </div>
 
- 
+    <div id="controls">
+        <div></div>
+        <div class="btn" data-dir="up">▲</div>
+        <div></div>
+        <div class="btn" data-dir="left">◀</div>
+        <div class="btn" data-dir="down">▼</div>
+        <div class="btn" data-dir="right">▶</div>
+    </div>
 
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-<script>  
-    const canvas = document.getElementById("gameCanvas");  
-    const ctx = canvas.getContext("2d");  
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
 
-    ctx.textBaseline = 'top';  
-    ctx.textAlign = 'left';  
+        const speedDisplay = document.getElementById("speed");
+        const scoreDisplay = document.getElementById("score");
+        const livesDisplay = document.getElementById("lives");
+        const countdownEl = document.getElementById("countdown");
+        const gameOverEl = document.getElementById("gameOver");
+        const highScoreMessageEl = document.getElementById("highScoreMessage");
+        const serverHighScoreDisplay = document.getElementById("serverHighScore");
 
-    const speedDisplay = document.getElementById("speed");  
-    const scoreDisplay = document.getElementById("score");  
-    const livesDisplay = document.getElementById("lives");  
-    const countdownEl = document.getElementById("countdown");  
-    const gameOverEl = document.getElementById("gameOver");
-    const highScoreMessageEl = document.getElementById("highScoreMessage");
+        /* ---------------------------  
+            Áudio de fundo & efeitos  
+        --------------------------- */
+        const bgMusic = document.getElementById("bgMusic");
+        bgMusic.volume = 0.6;
 
-    /* ---------------------------  
-        Áudio de fundo & efeitos  
-    --------------------------- */  
-    const bgMusic = document.getElementById("bgMusic");  
-    bgMusic.volume = 0.6;  
+        const s_hit = document.getElementById("s_hit");
+        const s_coin = document.getElementById("s_coin");
+        const s_magnet = document.getElementById("s_magnet");
+        const s_heart = document.getElementById("s_heart");
+        const s_shield = document.getElementById("s_shield");
+        const s_gameover = document.getElementById("s_gameover");
+        const s_start = document.getElementById("s_start");
 
-    const s_hit = document.getElementById("s_hit");  
-    const s_coin = document.getElementById("s_coin");  
-    const s_magnet = document.getElementById("s_magnet");  
-    const s_heart = document.getElementById("s_heart");  
-    const s_shield = document.getElementById("s_shield");  
-    const s_gameover = document.getElementById("s_gameover");  
-    const s_start = document.getElementById("s_start");  
+        let audioUnlocked = false;
 
-    let audioUnlocked = false;  
+        function unlockAllAudio() {
+            if (audioUnlocked) return;
+            audioUnlocked = true;
 
-    function unlockAllAudio() {  
-        if (audioUnlocked) return;  
-        audioUnlocked = true;  
+            try {
+                bgMusic.muted = false;
+                bgMusic.play().catch(() => { /* ignorar */ });
+            } catch (e) { /* ignorar */ }
 
-        try {  
-            bgMusic.muted = false;  
-            bgMusic.play().catch(() => { /* ignorar */ });  
-        } catch (e) { /* ignorar */ }  
-
-        const effects = [s_hit, s_coin, s_magnet, s_heart, s_shield, s_gameover, s_start];  
-        effects.forEach(a => {  
-            if (!a) return;  
-            try {  
-                a.currentTime = 0;  
-                const p = a.play();  
-                if (p && p.then) {  
-                    p.then(() => { a.pause(); a.currentTime = 0; }).catch(() => { /* bloqueado */ });  
-                }  
-            } catch (err) { /* ignorar */ }  
-        });  
-    }  
-
-    function playSound(audioEl) {  
-        if (!audioEl) return;  
-        try {  
-            const cloned = audioEl.cloneNode(true);  
-            cloned.muted = false;  
-            cloned.volume = audioEl.volume ?? 1.0;  
-            cloned.play().catch(() => { /* se bloquear, ignora */ });  
-        } catch (e) {  
-            try { audioEl.play().catch(() => { }); } catch (err) { }  
-        }  
-    }  
-
-    function firstInteractionHandler() {  
-        unlockAllAudio();  
-        // Remove listeners for one-time execution
-        window.removeEventListener("mousedown", firstInteractionHandler);  
-        window.removeEventListener("touchstart", firstInteractionHandler);  
-        window.removeEventListener("keydown", firstInteractionHandler);  
-    }  
-    // Listen for the first user interaction
-    window.addEventListener("mousedown", firstInteractionHandler, { once: true });  
-    window.addEventListener("touchstart", firstInteractionHandler, { once: true });  
-    window.addEventListener("keydown", firstInteractionHandler, { once: true });  
-
-    /* ---------------------------  
-        Integração com Backend  
-    --------------------------- */
-
-    /**
-     * Envia a pontuação final para o backend para salvar como recorde.
-     * @param {number} finalScore 
-     */
-    async function saveScore(finalScore) {
-        console.log("Tentando salvar pontuação:", finalScore);
-        highScoreMessageEl.textContent = "Salvando recorde...";
-        highScoreMessageEl.style.display = 'block'; // Garante que a mensagem apareça
-
-        try {
-            // A ROTA FOI AJUSTADA PARA: /api/dash_score
-            const response = await fetch('/api/dash_score', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ score: finalScore })
+            const effects = [s_hit, s_coin, s_magnet, s_heart, s_shield, s_gameover, s_start];
+            effects.forEach(a => {
+                if (!a) return;
+                try {
+                    a.currentTime = 0;
+                    const p = a.play();
+                    if (p && p.then) {
+                        p.then(() => { a.pause(); a.currentTime = 0; }).catch(() => { /* bloqueado */ });
+                    }
+                } catch (err) { /* ignorar */ }
             });
+        }
 
-            const result = await response.json();
+        function playSound(audioEl) {
+            if (!audioEl) return;
+            try {
+                const cloned = audioEl.cloneNode(true);
+                cloned.muted = false;
+                cloned.volume = audioEl.volume ?? 1.0;
+                cloned.play().catch(() => { /* se bloquear, ignora */ });
+            } catch (e) {
+                try { audioEl.play().catch(() => { }); } catch (err) { }
+            }
+        }
 
-            if (response.ok && result.status === 'ok') {
-                const savedScore = result.saved_high_score;
-                if (finalScore >= savedScore) {
-                    highScoreMessageEl.textContent = `Novo Recorde Salvo: ${savedScore}!`;
-                    highScoreMessageEl.classList.remove('text-red-400', 'text-gray-300');
-                    highScoreMessageEl.classList.add('text-yellow-400');
+        function firstInteractionHandler() {
+            unlockAllAudio();
+            // Remove listeners for one-time execution
+            window.removeEventListener("mousedown", firstInteractionHandler);
+            window.removeEventListener("touchstart", firstInteractionHandler);
+            window.removeEventListener("keydown", firstInteractionHandler);
+        }
+        // Listen for the first user interaction
+        window.addEventListener("mousedown", firstInteractionHandler, { once: true });
+        window.addEventListener("touchstart", firstInteractionHandler, { once: true });
+        window.addEventListener("keydown", firstInteractionHandler, { once: true });
+
+        /* ---------------------------  
+            Integração com Backend  
+        --------------------------- */
+
+        /**
+         * Envia a pontuação final para o backend para salvar como recorde.
+         * @param {number} finalScore 
+         */
+        async function saveScore(finalScore) {
+            console.log("Tentando salvar pontuação:", finalScore);
+            highScoreMessageEl.textContent = "Salvando recorde...";
+            highScoreMessageEl.style.display = 'block'; // Garante que a mensagem apareça
+
+            try {
+                // A ROTA FOI AJUSTADA PARA: /api/dash_score
+                const response = await fetch('/api/dash_score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ score: finalScore })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'ok') {
+                    const savedScore = result.saved_high_score;
+                    if (finalScore >= savedScore) {
+                        highScoreMessageEl.textContent = `Novo Recorde Salvo: ${savedScore}!`;
+                        highScoreMessageEl.classList.remove('text-red-400', 'text-gray-300');
+                        highScoreMessageEl.classList.add('text-yellow-400');
+                    } else {
+                        highScoreMessageEl.textContent = `Pontuação salva: ${finalScore}. Recorde Atual: ${savedScore}`;
+                        highScoreMessageEl.classList.remove('text-red-400', 'text-yellow-400');
+                        highScoreMessageEl.classList.add('text-gray-300');
+                    }
                 } else {
-                    highScoreMessageEl.textContent = `Pontuação salva: ${finalScore}. Recorde Atual: ${savedScore}`;
-                    highScoreMessageEl.classList.remove('text-red-400', 'text-yellow-400');
-                    highScoreMessageEl.classList.add('text-gray-300');
+                    // Erro de autenticação ou servidor
+                    console.error("Erro ao salvar pontuação:", result.message || response.statusText);
+                    highScoreMessageEl.textContent = "Erro ao salvar pontuação (faça login ou tente novamente).";
+                    highScoreMessageEl.classList.remove('text-yellow-400', 'text-gray-300');
+                    highScoreMessageEl.classList.add('text-red-400');
                 }
-            } else {
-                // Erro de autenticação ou servidor
-                console.error("Erro ao salvar pontuação:", result.message || response.statusText);
-                highScoreMessageEl.textContent = "Erro ao salvar pontuação (faça login ou tente novamente).";
+            } catch (error) {
+                console.error("Falha na comunicação com o servidor:", error);
+                highScoreMessageEl.textContent = "Falha de conexão. Tente novamente.";
                 highScoreMessageEl.classList.remove('text-yellow-400', 'text-gray-300');
                 highScoreMessageEl.classList.add('text-red-400');
             }
-        } catch (error) {
-            console.error("Falha na comunicação com o servidor:", error);
-            highScoreMessageEl.textContent = "Falha de conexão. Tente novamente.";
-            highScoreMessageEl.classList.remove('text-yellow-400', 'text-gray-300');
-            highScoreMessageEl.classList.add('text-red-400');
         }
-    }
 
 
-    /* ---------------------------  
-        Variáveis do jogo  
-    --------------------------- */  
-    let roadSpeed = 3, acceleration = 0.0003, playerSpeed = 5;  
-    let playerX = canvas.width / 2 - 20, playerY = canvas.height - 120;  
-    const roadWidth = 300, laneCount = 4, laneWidth = roadWidth / laneCount;  
-    let roadLines = [], keys = {}, score = 0, lives = 3;  
-    let obstacles = [], foods = [], magnets = [], hearts = [], shields = [], popups = [];  
-    let magnetActive = false, magnetTimer = 0, shieldActive = false, shieldTimer = 0;  
-    let gameOver = false, gameStarted = false;  
+        /* ---------------------------  
+            Variáveis do jogo  
+        --------------------------- */
+        let roadSpeed = 3, acceleration = 0.0003, playerSpeed = 5;
+        let playerX = canvas.width / 2 - 20, playerY = canvas.height - 120;
+        const roadWidth = 300, laneCount = 4, laneWidth = roadWidth / laneCount;
+        let roadLines = [], keys = {}, score = 0, lives = 3;
+        let obstacles = [], foods = [], magnets = [], hearts = [], shields = [], popups = [];
+        let magnetActive = false, magnetTimer = 0, shieldActive = false, shieldTimer = 0;
+        let gameOver = false, gameStarted = false;
+        let currentHighScore = parseInt(serverHighScoreDisplay.textContent) || 0;
 
-    let inactivityTimer = 0, inactivityLimit = 480;  
-    function punishInactivity() { score = 0; updateScoreDisplay(); createPopup("- Pontos zerados", player.x, player.y - 20); playSound(s_hit /* efeito discreto para feedback */); }  
+        let inactivityTimer = 0, inactivityLimit = 480;
+        function punishInactivity() { score = 0; updateScoreDisplay(); createPopup("- Pontos zerados", player.x, player.y - 20); playSound(s_hit /* efeito discreto para feedback */); }
 
-    const player = { x: playerX, y: playerY, w: 20, h: 35, color: "#00ff99" };  
+        const player = { x: playerX, y: playerY, w: 20, h: 35, color: "#00ff99" };
 
-    const obstacleTypes = [  
-        { emoji: "🚧", w: 25, h: 25 },  
-        { emoji: "🚧", w: 25, h: 25 },  
-        { emoji: "🚧", w: 25, h: 25 }  
-    ];  
+        const obstacleTypes = [
+            { emoji: "🚧", w: 25, h: 25 },
+            { emoji: "🚧", w: 25, h: 25 },
+            { emoji: "🚧", w: 25, h: 25 }
+        ];
 
-    const foodTypes = [  
-        { emoji: "🍔", w: 30, h: 30, points: 5 },  
-        { emoji: "🍕", w: 30, h: 30, points: 10 }  
-    ];  
+        const foodTypes = [
+            { emoji: "🍔", w: 30, h: 30, points: 5 },
+            { emoji: "🍕", w: 30, h: 30, points: 10 }
+        ];
 
-    const magnetType = { emoji: "🧲", w: 30, h: 30 };  
-    const heartType = { emoji: "🤍", w: 30, h: 30 };  
-    const shieldType = { emoji: "🛡", w: 30, h: 30 };  
-    const obstaclePenalty = 150; // penalidade ao bater em obstáculo  
+        const magnetType = { emoji: "🧲", w: 30, h: 30 };
+        const heartType = { emoji: "🤍", w: 30, h: 30 };
+        const shieldType = { emoji: "🛡️", w: 30, h: 30 };
+        const obstaclePenalty = 70;
 
-    /* ---------------------------  
-        Popups  
-    --------------------------- */  
-    function drawPopups() {  
-        ctx.font = "20px Arial";  
-        ctx.fillStyle = "#00ff99";  
-        for (let i = popups.length - 1; i >= 0; i--) {  
-            const p = popups[i];  
-            ctx.globalAlpha = p.alpha;  
-            // Ajuste para centralizar o texto do popup (aproximado)
-            ctx.fillText(p.text, p.x - (p.text.length * 3.5), p.y);  
-            p.y -= 1.2;  
-            p.alpha -= 0.02;  
-            if (p.alpha <= 0) popups.splice(i, 1);  
-        }  
-        ctx.globalAlpha = 1;  
-    }  
-
-    function createPopup(text, x, y) { popups.push({ text, x, y, alpha: 1 }); }  
-
-    /* ---------------------------  
-        Util  
-    --------------------------- */  
-    function clampScore() { if (score < 0) score = 0; }  
-    function updateScoreDisplay() { clampScore(); scoreDisplay.textContent = Math.floor(score); }  
-    function collides(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + b.h > b.y; }  
-
-    function safeSpawn(list, obj) {  
-        const allLists = [obstacles, foods, magnets, hearts, shields];  
-        for (let arr of allLists) for (let item of arr) if (collides(obj, item)) return false;  
-        list.push(obj);  
-        return true;  
-    }  
-
-    /* ---------------------------  
-        Spawn de objetos  
-    --------------------------- */  
-    function spawn(list, type, chance) {
-        if (Math.random() < chance) {
-            const lane = Math.floor(Math.random() * laneCount);
-            const roadX = canvas.width / 2 - roadWidth / 2;
-            const objType = Array.isArray(type) ? type[Math.floor(Math.random() * type.length)] : type;
-            const obj = { ...objType, x: roadX + lane * laneWidth + laneWidth / 2 - objType.w / 2, y: -50 };
-            safeSpawn(list, obj);
+        function drawPopups() {
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "#00ff99";
+            for (let i = popups.length - 1; i >= 0; i--) {
+                const p = popups[i];
+                ctx.globalAlpha = p.alpha;
+                ctx.fillText(p.text, p.x - (p.text.length * 3.5), p.y);
+                p.y -= 1.2;
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) popups.splice(i, 1);
+            }
+            ctx.globalAlpha = 1;
         }
-    }
-    
-    function spawnObstacle() { spawn(obstacles, obstacleTypes, 0.02); }
-    function spawnFood() { spawn(foods, foodTypes, 0.015); }
-    function spawnMagnet() { spawn(magnets, magnetType, 0.0002); }  
-    function spawnHeart() { spawn(hearts, heartType, 0.0001); }  
-    function spawnShield() { spawn(shields, shieldType, 0.0002); }  
 
-    /* ---------------------------  
-        Input  
-    --------------------------- */  
-    window.addEventListener("keydown", (e) => {  
-        keys[e.key] = true;  
-        // Mapeamento para teclas de seta do navegador
-        if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
-            e.preventDefault();
-            if (["ArrowLeft", "ArrowRight"].includes(e.key)) inactivityTimer = 0;  
+        function createPopup(text, x, y) { popups.push({ text, x, y, alpha: 1 }); }
+
+        function clampScore() { if (score < 0) score = 0; }
+        function updateScoreDisplay() { clampScore(); scoreDisplay.textContent = Math.floor(score); }
+        function collides(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + b.h > b.y; }
+
+        function safeSpawn(list, obj) {
+            const allLists = [obstacles, foods, magnets, hearts, shields];
+            for (let arr of allLists) for (let item of arr) if (collides(obj, item)) return false;
+            list.push(obj);
+            return true;
         }
-        // Mapeamento para teclas dos botões virtuais
-        if (e.key === "a" || e.key === "A") keys.left = true;
-        if (e.key === "d" || e.key === "D") keys.right = true;
-        if (e.key === "w" || e.key === "W") keys.up = true;
-        if (e.key === "s" || e.key === "S") keys.down = true;
 
-        if (keys.left || keys.right) inactivityTimer = 0;
-    });  
-    window.addEventListener("keyup", (e) => {
-        keys[e.key] = false;
-        if (e.key === "a" || e.key === "A") keys.left = false;
-        if (e.key === "d" || e.key === "D") keys.right = false;
-        if (e.key === "w" || e.key === "W") keys.up = false;
-        if (e.key === "s" || e.key === "S") keys.down = false;
-    });  
-
-    window.addEventListener("keydown", (e) => { 
-        if (e.key === "r" || e.key === "R") {
-            // Se o jogo acabou e o usuário aperta R, reinicia
-            if (gameOver) {
-                restartGame();
+        function spawn(list, type, chance) {
+            if (Math.random() < chance) {
+                const lane = Math.floor(Math.random() * laneCount);
+                const roadX = canvas.width / 2 - roadWidth / 2;
+                const objType = Array.isArray(type) ? type[Math.floor(Math.random() * type.length)] : type;
+                const obj = { ...objType, x: roadX + lane * laneWidth + laneWidth / 2 - objType.w / 2, y: -50 };
+                safeSpawn(list, obj);
             }
         }
-    });  
 
-    document.querySelectorAll('.btn').forEach(btn => {  
-        btn.addEventListener('touchstart', (ev) => { ev.preventDefault(); keys[btn.dataset.dir] = true; if (btn.dataset.dir === "left" || btn.dataset.dir === "right") inactivityTimer = 0; });  
-        btn.addEventListener('touchend', (ev) => { ev.preventDefault(); keys[btn.dataset.dir] = false; });  
-        btn.addEventListener('mousedown', () => { keys[btn.dataset.dir] = true; if (btn.dataset.dir === "left" || btn.dataset.dir === "right") inactivityTimer = 0; });  
-        btn.addEventListener('mouseup', () => { keys[btn.dataset.dir] = false; });  
-        btn.addEventListener('mouseleave', () => { keys[btn.dataset.dir] = false; }); // Se arrastar o mouse para fora do botão
-    }); 
-    
-    // Adiciona listener para reiniciar ao tocar/clicar na tela de Game Over
-    gameOverEl.addEventListener('click', restartGame);
-    gameOverEl.addEventListener('touchstart', restartGame);
+        function spawnObstacle() { spawn(obstacles, obstacleTypes, 0.02); }
+        function spawnFood() { spawn(foods, foodTypes, 0.015); }
+        function spawnMagnet() { spawn(magnets, magnetType, 0.0002); }
+        function spawnHeart() { spawn(hearts, heartType, 0.0001); }
+        function spawnShield() { spawn(shields, shieldType, 0.0002); }
 
-    for (let i = 0; i < 20; i++) roadLines.push({ x: canvas.width / 2, y: i * 40 });  
+        window.addEventListener("keydown", (e) => {
+            keys[e.key] = true;
 
-    /* ---------------------------  
-        Loop principal  
-    --------------------------- */  
-    function drawList(list) {  
-        ctx.font = "28px Arial";  
-        list.forEach(o => { 
-            ctx.fillText(o.emoji, o.x, o.y + o.h); 
-            o.y += roadSpeed; 
-        });  
-        return list.filter(o => o.y < canvas.height + 50);  
-    }  
+            if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+                e.preventDefault();
+                if (["ArrowLeft", "ArrowRight"].includes(e.key)) inactivityTimer = 0;
+            }
 
-    function drawCar(p) {  
-        // Desenho básico do carro
-        ctx.fillStyle = "#00ff99"; 
-        ctx.fillRect(p.x, p.y, p.w, p.h);  
-        ctx.fillStyle = "#002200";  
-        ctx.fillRect(p.x + 4, p.y + 8, p.w - 8, 12);  
-        ctx.fillRect(p.x + 4, p.y + p.h - 20, p.w - 8, 12);  
-        ctx.fillStyle = "#ffff66";  
-        ctx.fillRect(p.x + 3, p.y, 6, 6);  
-        ctx.fillRect(p.x + p.w - 9, p.y, 6, 6);  
-        ctx.fillStyle = "#000";  
-        ctx.fillRect(p.x - 4, p.y + 8, 6, 15);  
-        ctx.fillRect(p.x + p.w - 2, p.y + 8, 6, 15);  
-        ctx.fillRect(p.x - 4, p.y + p.h - 25, 6, 15);  
-        ctx.fillRect(p.x + p.w - 2, p.y + p.h - 25, 6, 15);  
+            if (e.key === "a" || e.key === "A") keys.left = true;
+            if (e.key === "d" || e.key === "D") keys.right = true;
+            if (e.key === "w" || e.key === "W") keys.up = true;
+            if (e.key === "s" || e.key === "S") keys.down = true;
 
-        // Desenha o escudo se ativo
-        if (shieldActive) { 
-            ctx.strokeStyle = "#00aaff"; 
-            ctx.lineWidth = 4; 
-            ctx.beginPath(); 
-            ctx.arc(p.x + p.w / 2, p.y + p.h / 2, 35, 0, Math.PI * 2); 
-            ctx.stroke(); 
-        }  
-    }  
+            if (keys.left || keys.right) inactivityTimer = 0;
+        });
+        window.addEventListener("keyup", (e) => {
+            keys[e.key] = false;
+            if (e.key === "a" || e.key === "A") keys.left = false;
+            if (e.key === "d" || e.key === "D") keys.right = false;
+            if (e.key === "w" || e.key === "W") keys.up = false;
+            if (e.key === "s" || e.key === "S") keys.down = false;
+        });
 
-    function checkCollision() {  
-        for (let i = obstacles.length - 1; i >= 0; i--) {  
-            let o = obstacles[i];  
-            if (collides(player, o)) {  
-                obstacles.splice(i, 1);  
-                if (!shieldActive) {  
-                    lives--; livesDisplay.textContent = lives;  
-                    score -= obstaclePenalty; if (score < 0) score = 0;  
-                    createPopup("-" + obstaclePenalty, player.x, player.y - 20);  
-                    playSound(s_hit);  
-                    updateScoreDisplay();  
-                    if (lives <= 0) {  
-                        gameOver = true;  
-                        playSound(s_gameover);  
-                        bgMusic.pause();
-                        
-                        // CHAMA A FUNÇÃO PARA SALVAR A PONTUAÇÃO NO BACKEND
-                        saveScore(Math.floor(score));
-                        
-                        // Exibe a tela de Game Over. O resultado do saveScore será exibido na tela.
-                        gameOverEl.style.display = 'block';
-                    }  
-                } else { 
-                    // Acertou o obstáculo com escudo
-                    playSound(s_hit); 
-                }  
-            }  
-        }  
-    }  
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "r" || e.key === "R") {
+                if (gameOver) {
+                    restartGame();
+                }
+            }
+        });
 
-    function checkFoodCollection() {  
-        for (let i = foods.length - 1; i >= 0; i--) {  
-            let f = foods[i];  
-            if (collides(player, f)) {  
-                score += f.points;  
-                createPopup("+" + f.points, f.x, f.y);  
-                foods.splice(i, 1);  
-                playSound(s_coin);  
-                updateScoreDisplay();  
-                continue;  
-            }  
-            if (magnetActive) { 
-                let dx = player.x - f.x, dy = player.y - f.y; 
-                let dist = Math.sqrt(dx * dx + dy * dy); 
-                if (dist < 150) { 
-                    f.x += dx / 12; 
-                    f.y += dy / 12; 
-                } 
-            }  
-        }  
-    }  
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('touchstart', (ev) => { ev.preventDefault(); keys[btn.dataset.dir] = true; if (btn.dataset.dir === "left" || btn.dataset.dir === "right") inactivityTimer = 0; });
+            btn.addEventListener('touchend', (ev) => { ev.preventDefault(); keys[btn.dataset.dir] = false; });
+            btn.addEventListener('mousedown', () => { keys[btn.dataset.dir] = true; if (btn.dataset.dir === "left" || btn.dataset.dir === "right") inactivityTimer = 0; });
+            btn.addEventListener('mouseup', () => { keys[btn.dataset.dir] = false; });
+            btn.addEventListener('mouseleave', () => { keys[btn.dataset.dir] = false; });
+        });
 
-    function checkMagnetCollection() { for (let i = magnets.length - 1; i >= 0; i--) if (collides(player, magnets[i])) { magnets.splice(i, 1); magnetActive = true; magnetTimer = 600; playSound(s_magnet); } }  
-    function checkHeartCollection() { for (let i = hearts.length - 1; i >= 0; i--) if (collides(player, hearts[i])) { hearts.splice(i, 1); lives++; livesDisplay.textContent = lives; playSound(s_heart); } }  
-    function checkShieldCollection() { for (let i = shields.length - 1; i >= 0; i--) if (collides(player, shields[i])) { shields.splice(i, 1); shieldActive = true; shieldTimer = 600; playSound(s_shield); } }  
+        gameOverEl.addEventListener('click', restartGame);
+        gameOverEl.addEventListener('touchstart', restartGame);
 
-    function draw() {  
-        if (!gameStarted) return;  
-        if (paused) return;  
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);  
-        const roadX = canvas.width / 2 - roadWidth / 2;  
-        // Desenha a estrada principal (cinza)
-        ctx.fillStyle = "#333"; ctx.fillRect(roadX, 0, roadWidth, canvas.height);  
-        // Desenha as laterais da estrada (meio-fio)
-        ctx.fillStyle = "#888"; ctx.fillRect(roadX - 20, 0, 20, canvas.height); ctx.fillRect(roadX + roadWidth, 0, 20, canvas.height);  
-        
-        // Desenha as linhas tracejadas das faixas
-        ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.setLineDash([20, 20]);  
-        for (let i = 1; i < laneCount; i++) { const lineX = roadX + i * laneWidth; ctx.beginPath(); ctx.moveTo(lineX, 0); ctx.lineTo(lineX, canvas.height); ctx.stroke(); }  
-        ctx.setLineDash([]);  
-        
-        // Move as linhas da estrada para dar sensação de movimento
-        roadLines.forEach(rl => { ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rl.x, rl.y); ctx.lineTo(rl.x, rl.y + 20); ctx.stroke(); rl.y += roadSpeed; if (rl.y > canvas.height) rl.y = -20; });  
+        for (let i = 0; i < 20; i++) roadLines.push({ x: canvas.width / 2, y: i * 40 });
 
-        let moved = false;  
-        if (keys.ArrowLeft || keys.left) { player.x -= playerSpeed; moved = true; }  
-        if (keys.ArrowRight || keys.right) { player.x += playerSpeed; moved = true; }  
-        if (keys.ArrowUp || keys.up) player.y -= playerSpeed;  
-        if (keys.ArrowDown || keys.down) player.y += playerSpeed;  
-
-        // Limita o carro à área da estrada
-        if (player.x < roadX) player.x = roadX; 
-        if (player.x + player.w > roadX + roadWidth) player.x = roadX + roadWidth - player.w;  
-        if (player.y < 0) player.y = 0; 
-        if (player.y + player.h > canvas.height) player.y = canvas.height - player.h;  
-
-        // Desenha e move todos os elementos (obstáculos, comida, power-ups)
-        obstacles = drawList(obstacles); 
-        foods = drawList(foods); 
-        magnets = drawList(magnets); 
-        hearts = drawList(hearts); 
-        shields = drawList(shields); 
-        
-        drawCar(player); 
-        drawPopups();  
-
-        // Verifica interações
-        checkCollision(); 
-        checkFoodCollection(); 
-        checkMagnetCollection(); 
-        checkHeartCollection(); 
-        checkShieldCollection();  
-
-        // Atualiza temporizadores de power-ups
-        if (magnetActive) { magnetTimer--; if (magnetTimer <= 0) magnetActive = false; }  
-        if (shieldActive) { shieldTimer--; if (shieldTimer <= 0) shieldActive = false; }  
-
-        // Aumenta a dificuldade
-        roadSpeed += acceleration;  
-        speedDisplay.textContent = Math.floor(roadSpeed * 10);  
-        score += 0.01;  
-        updateScoreDisplay();  
-
-        // Tenta criar novos objetos
-        spawnObstacle(); spawnFood(); spawnMagnet(); spawnHeart(); spawnShield();  
-
-        // Lógica de inatividade
-        if (moved) inactivityTimer = 0; else { inactivityTimer++; if (inactivityTimer >= inactivityLimit) { punishInactivity(); inactivityTimer = 0; } }  
-
-        if (!gameOver) requestAnimationFrame(draw);  
-    }  
-
-    let paused = false;  
-    const pauseBtn = document.getElementById("pauseBtn");  
-
-    pauseBtn.addEventListener("click", () => {  
-        paused = !paused;  
-
-        if (paused) {  
-            pauseBtn.textContent = "▶";  
-            bgMusic.pause();
-        } else {  
-            pauseBtn.textContent = "⏸";  
-            bgMusic.play().catch(()=>{});
-            requestAnimationFrame(draw);  
-        }  
-    });  
-    
-    function startCountdown() {  
-        gameOverEl.style.display = "none";
-        highScoreMessageEl.textContent = ""; // Limpa a mensagem do recorde anterior
-        let count = 3;  
-        countdownEl.textContent = count;  
-        countdownEl.style.display = "block";
-        playSound(s_start); // Toca o som de início antes da contagem
-        const interval = setInterval(() => {  
-            count--;  
-            if (count > 0) { 
-                countdownEl.textContent = count; 
-                playSound(s_start); 
-            }  
-            else {  
-                clearInterval(interval);  
-                countdownEl.style.display = "none";  
-                gameStarted = true;  
-                bgMusic.play().catch(()=>{});
-                draw();  
-            }  
-        }, 1000);  
-    }  
-
-    function restartGame() {  
-        if (gameOver) {
-            score = 0; roadSpeed = 3; player.x = canvas.width / 2 - 20; player.y = canvas.height - 120;  
-            obstacles = []; foods = []; magnets = []; hearts = []; shields = []; popups = [];  
-            magnetActive = shieldActive = false; magnetTimer = shieldTimer = 0; lives = 3; gameOver = false;  
-            updateScoreDisplay(); livesDisplay.textContent = lives;  
-            inactivityTimer = 0; 
-            startCountdown();
+        function drawList(list) {
+            ctx.font = "28px Arial";
+            list.forEach(o => {
+                ctx.fillText(o.emoji, o.x, o.y + o.h);
+                o.y += roadSpeed;
+            });
+            return list.filter(o => o.y < canvas.height + 50);
         }
-    }  
 
-    startCountdown();  
-</script>
+        function drawCar(p) {
+            ctx.fillStyle = "#00ff99";
+            ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.fillStyle = "#002200";
+            ctx.fillRect(p.x + 4, p.y + 8, p.w - 8, 12);
+            ctx.fillRect(p.x + 4, p.y + p.h - 20, p.w - 8, 12);
+            ctx.fillStyle = "#ffff66";
+            ctx.fillRect(p.x + 3, p.y, 6, 6);
+            ctx.fillRect(p.x + p.w - 9, p.y, 6, 6);
+            ctx.fillStyle = "#000";
+            ctx.fillRect(p.x - 4, p.y + 8, 6, 15);
+            ctx.fillRect(p.x + p.w - 2, p.y + 8, 6, 15);
+            ctx.fillRect(p.x - 4, p.y + p.h - 25, 6, 15);
+            ctx.fillRect(p.x + p.w - 2, p.y + p.h - 25, 6, 15);
+
+            if (shieldActive) {
+                ctx.strokeStyle = "#00aaff";
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(p.x + p.w / 2, p.y + p.h / 2, 35, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function checkCollision() {
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let o = obstacles[i];
+                if (collides(player, o)) {
+                    obstacles.splice(i, 1);
+                    if (!shieldActive) {
+                        lives--; livesDisplay.textContent = lives;
+                        score -= obstaclePenalty; if (score < 0) score = 0;
+                        createPopup("-" + obstaclePenalty, player.x, player.y - 20);
+                        playSound(s_hit);
+                        updateScoreDisplay();
+                        if (lives <= 0) {
+                            gameOver = true;
+                            playSound(s_gameover);
+                            bgMusic.pause();
+
+                            saveScore(Math.floor(score));
+
+                            gameOverEl.style.display = 'block';
+                        }
+                    } else {
+
+                        playSound(s_hit);
+                    }
+                }
+            }
+        }
+
+        function checkFoodCollection() {
+            for (let i = foods.length - 1; i >= 0; i--) {
+                let f = foods[i];
+                if (collides(player, f)) {
+                    score += f.points;
+                    createPopup("+" + f.points, f.x, f.y);
+                    foods.splice(i, 1);
+                    playSound(s_coin);
+                    if (score > currentHighScore) {
+                        currentHighScore = score;
+                        serverHighScoreDisplay.textContent = Math.floor(currentHighScore);
+                    }
+                    if (magnetActive) {
+                        let dx = player.x - f.x, dy = player.y - f.y;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            f.x += dx / 12;
+                            f.y += dy / 12;
+                        }
+                    }
+                }
+            }
+        }
+        function checkMagnetCollection() { for (let i = magnets.length - 1; i >= 0; i--) if (collides(player, magnets[i])) { magnets.splice(i, 1); magnetActive = true; magnetTimer = 600; playSound(s_magnet); } }
+        function checkHeartCollection() { for (let i = hearts.length - 1; i >= 0; i--) if (collides(player, hearts[i])) { hearts.splice(i, 1); lives++; livesDisplay.textContent = lives; playSound(s_heart); } }
+        function checkShieldCollection() { for (let i = shields.length - 1; i >= 0; i--) if (collides(player, shields[i])) { shields.splice(i, 1); shieldActive = true; shieldTimer = 600; playSound(s_shield); } }
+
+        function draw() {
+            if (!gameStarted) return;
+            if (paused) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const roadX = canvas.width / 2 - roadWidth / 2;
+            ctx.fillStyle = "#333"; ctx.fillRect(roadX, 0, roadWidth, canvas.height);
+            ctx.fillStyle = "#888"; ctx.fillRect(roadX - 20, 0, 20, canvas.height); ctx.fillRect(roadX + roadWidth, 0, 20, canvas.height);
+
+            ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.setLineDash([20, 20]);
+            for (let i = 1; i < laneCount; i++) { const lineX = roadX + i * laneWidth; ctx.beginPath(); ctx.moveTo(lineX, 0); ctx.lineTo(lineX, canvas.height); ctx.stroke(); }
+            ctx.setLineDash([]);
+
+            roadLines.forEach(rl => { ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(rl.x, rl.y); ctx.lineTo(rl.x, rl.y + 20); ctx.stroke(); rl.y += roadSpeed; if (rl.y > canvas.height) rl.y = -20; });
+
+            let moved = false;
+            if (keys.ArrowLeft || keys.left) { player.x -= playerSpeed; moved = true; }
+            if (keys.ArrowRight || keys.right) { player.x += playerSpeed; moved = true; }
+            if (keys.ArrowUp || keys.up) player.y -= playerSpeed;
+            if (keys.ArrowDown || keys.down) player.y += playerSpeed;
+
+            if (player.x < roadX) player.x = roadX;
+            if (player.x + player.w > roadX + roadWidth) player.x = roadX + roadWidth - player.w;
+            if (player.y < 0) player.y = 0;
+            if (player.y + player.h > canvas.height) player.y = canvas.height - player.h;
+
+            obstacles = drawList(obstacles);
+            foods = drawList(foods);
+            magnets = drawList(magnets);
+            hearts = drawList(hearts);
+            shields = drawList(shields);
+
+            drawCar(player);
+            drawPopups();
+
+            checkCollision();
+            checkFoodCollection();
+            checkMagnetCollection();
+            checkHeartCollection();
+            checkShieldCollection();
+
+            if (magnetActive) { magnetTimer--; if (magnetTimer <= 0) magnetActive = false; }
+            if (shieldActive) { shieldTimer--; if (shieldTimer <= 0) shieldActive = false; }
+
+            roadSpeed += acceleration;
+            speedDisplay.textContent = Math.floor(roadSpeed * 10);
+            score += 0.01;
+            updateScoreDisplay();
+            if (score > currentHighScore) {
+                currentHighScore = score;
+                serverHighScoreDisplay.textContent = Math.floor(currentHighScore);
+            }
+
+            spawnObstacle(); spawnFood(); spawnMagnet(); spawnHeart(); spawnShield();
+
+            if (moved) inactivityTimer = 0; else { inactivityTimer++; if (inactivityTimer >= inactivityLimit) { punishInactivity(); inactivityTimer = 0; } }
+
+            if (!gameOver) requestAnimationFrame(draw);
+        }
+
+        let paused = false;
+        const pauseBtn = document.getElementById("pauseBtn");
+
+        pauseBtn.addEventListener("click", () => {
+            paused = !paused;
+
+            if (paused) {
+                pauseBtn.textContent = "▶";
+                bgMusic.pause();
+            } else {
+                pauseBtn.textContent = "⏸";
+                bgMusic.play().catch(() => { });
+                requestAnimationFrame(draw);
+            }
+        });
+
+        function startCountdown() {
+            gameOverEl.style.display = "none";
+            highScoreMessageEl.textContent = "";
+            let count = 3;
+            countdownEl.textContent = count;
+            countdownEl.style.display = "block";
+            playSound(s_start);
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownEl.textContent = count;
+                    playSound(s_start);
+                }
+                else {
+                    clearInterval(interval);
+                    countdownEl.style.display = "none";
+                    gameStarted = true;
+                    bgMusic.play().catch(() => { });
+                    draw();
+                }
+            }, 1000);
+        }
+
+        function restartGame() {
+            if (gameOver) {
+                score = 0; roadSpeed = 3; player.x = canvas.width / 2 - 20; player.y = canvas.height - 120;
+                obstacles = []; foods = []; magnets = []; hearts = []; shields = []; popups = [];
+                magnetActive = shieldActive = false; magnetTimer = shieldTimer = 0; lives = 3; gameOver = false;
+                updateScoreDisplay(); livesDisplay.textContent = lives;
+                inactivityTimer = 0;
+                startCountdown();
+            }
+        }
+
+        startCountdown();  
+    </script>
 
 </body>
+
 </html>
