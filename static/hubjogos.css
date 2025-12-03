@@ -173,6 +173,10 @@ thead {
     width: 100%;
 }
 
+.seu-usuario {
+    color: #40954d;
+}
+
 .tr-topo {
     background-color: #D86037;
     border-radius: 5px;

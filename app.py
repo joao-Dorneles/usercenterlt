@@ -11,6 +11,7 @@ import smtplib
 from flask import jsonify
 import requests
 import socket
+from sqlalchemy.sql.functions import coalesce
 #versao falha do sendgrid
 load_dotenv()
 
@@ -49,9 +50,7 @@ class usuarios(db.Model):
     senha_hash = db.Column(db.String(255), nullable=False)
     score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
     score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
-    total_score = db.Column(db.Integer, default=0, nullable=False)
-
-
+    # total_score = db.Column(db.Integer, default=0, nullable=False) ainda não existe
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha) 
@@ -171,8 +170,12 @@ def cadastro():
 
 @app.route("/hubjogos")
 @login_required
-def hubjogos():
-    return render_template("hubjogos.html")
+def hubjogos(): 
+    user_logado_id = session.get('user_id')
+    ranking_data = usuarios.query.order_by(
+        coalesce(usuarios.score_jogo1, 0).desc() 
+    ).all()
+    return render_template("hubjogos.html", ranking_data=ranking_data, user_logado_id=user_logado_id)
 
 @app.route("/deliverydash")
 def deliverydash():
@@ -251,10 +254,9 @@ def dash_score():
         return {"status": "error", "message": "Pontuação inválida"}, 400
 
     user = usuarios.query.get(session["user_id"])
-
     if novo_score > (user.score_jogo1 or 0):
         user.score_jogo1 = novo_score
-        db.session.commit()
+        db.session.commit() 
         return {"status": "ok", "saved_high_score": user.score_jogo1}
     
     return {"status": "ok", "saved_high_score": user.score_jogo1, "message": "Nova pontuação não é maior que a salva."}
@@ -273,10 +275,6 @@ def snake_score():
 
     return {"status": "ok", "saved_high_score": user.score_jogo2}
 
-@app.route("/ranking")
-def ranking():
-    top_scores = usuarios.query.order_by(usuarios.total_score.desc()).limit(15).all()
-    return render_template("ranking.html", ranking_data=top_scores)
 
 @app.route("/test-smtp")
 def test_smtp():
