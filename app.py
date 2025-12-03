@@ -12,6 +12,8 @@ from flask import jsonify
 import requests
 import socket
 from sqlalchemy.sql.functions import coalesce
+import re
+
 #versao falha do sendgrid
 load_dotenv()
 
@@ -73,6 +75,51 @@ class usuarios(db.Model):
             return None
         return usuarios.query.get(user_id)
     
+def validar_email(email):
+        padrao = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        return re.match(padrao, email) is not None
+    
+def validar_nome(nome):
+    padrao = r'^[A-Za-zÀ-ÿ ]+$'
+    return re.match(padrao, nome) is not None
+
+def validar_senha(senha):
+    return len(senha) >= 6
+
+def validar_cpf(cpf):
+    """
+    Valida CPF removendo as do js pontuação e aplicando
+    a fórmula oficial dos dígitos verificadores.
+    """
+    cpf = re.sub(r'[^0-9]', '', cpf)
+
+    if len(cpf) != 11:
+        return False
+
+    if cpf in (c * 11 for c in "0123456789"):
+        return False
+
+        #Cálculo do primeiro dígito verificador
+    soma = 0
+    for i in range(9):
+        soma += int(cpf[i]) * (10 - i)
+    digito1 = (soma * 10) % 11
+    digito1 = 0 if digito1 == 10 else digito1
+
+    if digito1 != int(cpf[9]):
+        return False
+
+        # Cálculo do segundo dígito verificador
+    soma = 0
+    for i in range(10):
+        soma += int(cpf[i]) * (11 - i)
+    digito2 = (soma * 10) % 11
+    digito2 = 0 if digito2 == 10 else digito2
+
+    if digito2 != int(cpf[10]):
+        return False
+    return True
+
 def email_recuperar(user):
     token = user.get_reset_token()
     reset_url = url_for('reset_token', token=token, _external=True)
@@ -154,6 +201,22 @@ def cadastro():
         email = request.form['email'].strip().lower()
         senha = request.form['senha']
         cpf = request.form['cpf']
+
+        if not validar_nome(nome):
+            flash("Nome inválido. Use apenas letras.", "danger")
+            return render_template("cadastro.html")
+
+        if not validar_email(email):
+            flash("Email inválido.", "danger")
+            return render_template("cadastro.html")
+
+        if not validar_senha(senha):
+            flash("A senha deve ter pelo menos 6 caracteres.", "danger")
+            return render_template("cadastro.html")
+
+        if not validar_cpf(cpf):
+            flash("CPF inválido.", "danger")
+            return render_template("cadastro.html")
 
         novo_usuario = usuarios(nome=nome, email=email, cpf=cpf)
         novo_usuario.set_senha(senha)
