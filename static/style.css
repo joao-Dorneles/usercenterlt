@@ -136,6 +136,7 @@ label {
     transition: 0.5s;
     cursor: pointer;
     color: #D83737;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #recuperar-senha:hover {
@@ -184,6 +185,7 @@ button {
     cursor: pointer;
     color: #F1E5D1;
     font-family: "InkNutAntiqua", serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button:hover {
