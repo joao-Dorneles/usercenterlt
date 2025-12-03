@@ -161,7 +161,7 @@ header {
     justify-content: center;
     align-items: center;
     font-family: "InkNutAntiqua", serif;
-    font-size: 1rem;
+    font-size: 0.7rem;
     list-style: none;
     color: #52362B;
     gap: 1rem;
@@ -521,7 +521,7 @@ input::placeholder {
 
     .dados,
     .nomes-indice {
-        font-size: 1.3rem;
+        font-size: 1rem;
     }
 }
 
