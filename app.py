@@ -37,9 +37,9 @@ class usuarios(db.Model):
     email = db.Column(db.String(150))
     cpf = db.Column(db.String(14))
     senha_hash = db.Column(db.String(255), nullable=False)
-    score_jogo1 = db.Column(db.Integer, default=0, nullable=False)
-    score_jogo2 = db.Column(db.Integer, default=0, nullable=False)
-    total_score = db.Column(db.Integer, default=0, nullable=False)
+    score_jogo1 = db.Column(db.Integer, default=0)
+    score_jogo2 = db.Column(db.Integer, default=0)
+    total_score = db.Column(db.Integer, default=0)
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha) 
