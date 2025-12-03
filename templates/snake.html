@@ -81,24 +81,37 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        @media(min-width: 344px) {
+            .wrapper {
+                height: 130vmin !important;
+                padding-bottom: 20px;
+            }
+        }
+
+        @media(min-width: 500px) {
+            .wrapper {
+                height: 120vmin !important;
+                padding-bottom: 20px;
+            }
+        }
+
         @media(min-width: 600px) {
             .wrapper {
-                width: 65vmin;
-                height: 70vmin;
+                height: 100vmin !important;
+                padding-bottom: 20px;
+            }
+        }
+
+        @media(min-width: 1025px) {
+            .wrapper {
+                width: 65vmin !important;
+                height: 70vmin !important;
             }
         }
 
 
-
         @media screen and (max-width: 1025px) {
 
-            /* AQUI: deixa a wrapper mais alta no mobile */
-            .wrapper {
-                height: 95vmin;
-                padding-bottom: 20px;
-            }
-
-            /* mantém sua responsividade dos botões */
             .controls {
                 display: grid;
                 grid-template-columns: repeat(3, 55px);
