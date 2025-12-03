@@ -12,8 +12,9 @@
 <body>
 
     <header>
-        <a href="https://linhadotempo.onrender.com"><img class="img-header" id="seta-voltar"
-                src="../static/images/icons/seta-esquerda.png"></a>
+        <!-- <a href="https://linhadotempo.onrender.com"><img class="img-header" id="seta-voltar"
+                src="../static/images/icons/seta-esquerda.png"></a> -->
+        <a href="/hubjogos"><img class="img-header" id="seta-voltar" src="../static/images/icons/games.png"></a><!--isso temporariamente leva o usuario para a pagina da conta -->
         <img class="img-header" id="logo" src="../static/images/general/logoNOBG.png">
     </header>
 
@@ -243,7 +244,7 @@
             if (botaoCancelar) {
                 botaoCancelar.addEventListener('click', function () {
                     modalExcluir.style.display = 'none';
-                    if (timerInterval) clearInterval(timerInterval); 
+                    if (timerInterval) clearInterval(timerInterval);
                 });
             }
         });

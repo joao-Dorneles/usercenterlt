@@ -175,7 +175,7 @@ def index():
         if user and user.check_senha(senha):
             session['user_id'] = user.id
             flash('Logado com sucesso!', 'success')
-            return redirect(next_url or url_for('conta'))
+            return redirect(next_url or url_for('hubjogos')) #fallback temporario
         
         flash('Credenciais inválidas. Tente novamente.', 'danger')
         return render_template("index.html", next=next_url)
