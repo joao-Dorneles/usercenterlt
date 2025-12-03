@@ -218,7 +218,7 @@ def cadastro():
             flash("CPF inválido.", "danger")
             return render_template("cadastro.html")
 
-        novo_usuario = usuarios(nome=nome, email=email, cpf=cpf)
+        novo_usuario = usuarios(nome=nome[:15], email=email, cpf=cpf)
         novo_usuario.set_senha(senha)
         db.session.add(novo_usuario)
         try:
@@ -248,11 +248,52 @@ def deliverydash():
 def snake():
     return render_template("snake.html")
 
-@app.route("/conta")
+@app.route("/conta", methods=['GET', 'POST'])
 @login_required
 def conta():
     user_id = session.get('user_id')
     user = usuarios.query.get_or_404(user_id)
+    if request.method == 'POST':    
+        novo_nome = request.form.get('nome', user.nome).strip()
+        novo_email = request.form.get('email', user.email).strip().lower()
+        novo_cpf = request.form.get('cpf', user.cpf).strip()
+    
+        if not validar_nome(novo_nome):
+            flash("Nickname inválido. Use apenas letras e números, max 15.", "danger")
+            return redirect(url_for('conta'))
+
+        if not validar_email(novo_email):
+            flash("E-mail inválido. Verifique o formato.", "danger")
+            return redirect(url_for('conta'))
+
+        if not validar_cpf(novo_cpf):
+            flash("CPF inválido. Verifique a formatação.", "danger")
+            return redirect(url_for('conta'))
+        
+        if novo_email != user.email:
+            email_check = usuarios.query.filter(usuarios.email == novo_email, usuarios.id != user_id).first()
+            if email_check:
+                flash("Este e-mail já está em uso por outra conta.", "danger")
+                return redirect(url_for('conta'))
+
+        if novo_cpf != user.cpf:
+            cpf_check = usuarios.query.filter(usuarios.cpf == novo_cpf, usuarios.id != user_id).first()
+            if cpf_check:
+                flash("Este CPF já está cadastrado em outra conta.", "danger")
+                return redirect(url_for('conta'))
+
+        user.nome = novo_nome[:15]
+        user.email = novo_email
+        user.cpf = novo_cpf
+
+        try:
+            db.session.commit()
+            flash("Seus dados foram atualizados com sucesso!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash("Ocorreu um erro ao salvar as alterações. Tente novamente.", "danger")
+        
+            return redirect(url_for('conta'))
     return render_template("conta.html", user=user)
 
 @app.route("/logout")
@@ -338,6 +379,31 @@ def snake_score():
 
     return {"status": "ok", "saved_high_score": user.score_jogo2}
 
+
+# essa rota é responsavel pela exclusao, ou seja, é critica [!]
+@app.route("/excluir", methods=['POST'])
+@login_required
+def excluir_conta():
+    user_id = session.get('user_id')
+    user = usuarios.query.get(user_id) 
+
+    if not user:
+        flash("Erro: Usuário não encontrado.", "danger")
+        return redirect(url_for('index'))
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        session.pop('user_id', None) 
+        
+        flash("Sua conta foi excluída com sucesso. Sentiremos sua falta!", "success")
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"ERRO AO EXCLUIR CONTA: {e}")
+        flash("Ocorreu um erro ao excluir sua conta. Tente novamente.", "danger")
+        return redirect(url_for('conta'))
 
 @app.route("/test-smtp")
 def test_smtp():

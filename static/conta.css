@@ -276,6 +276,13 @@ header {
     -webkit-tap-highlight-color: transparent;
 }
 
+#confirmar-exclusao:disabled {
+    background-color: #bdc3c7 !important; 
+    color: #6b7677 !important; 
+    cursor: not-allowed !important;
+    font-size: 1rem;
+}
+
 #cancelar-exclusao {
     border-radius: 20px;
     width: 6rem;

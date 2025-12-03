@@ -41,48 +41,54 @@
             </div>
         </div>
         <div class="b-acao">
-            <button class="botao-excluir">Excluir Conta</button>
+            <button class="botao-excluir" id="abrir-modal-excluir">Excluir Conta</button>
             <button class="botao-sair"><a id="a-logout" href="/logout">Sair da Conta</a></button>
         </div>
     </div>
 
     <div class="editar" id="editar-email">
-        <form class="form-editar">
+        <form class="form-editar" action="/conta" method="POST">
             <label for="email" class="label-editar">Editar Email</label>
-            <input type="email" class="input-editar" placeholder="Informe o Novo Email">
+            <input type="email" name="email" class="input-editar" required value="{{ user.email }}"
+                placeholder="Informe o Novo Email">
+
+            <input type="hidden" name="nome" value="{{ user.nome }}">
+            <input type="hidden" name="cpf" value="{{ user.cpf }}">
+
             <div class="botoes-acao">
                 <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
                 <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
             </div>
+
         </form>
     </div>
 
     <div class="editar" id="editar-nome">
-        <form class="form-editar">
+        <form class="form-editar" action="/conta" method="POST">
             <label for="text" class="label-editar">Editar Nome</label>
-            <input type="text" class="input-editar" placeholder="Informe o Novo Nome">
-            <div class="botoes-acao">
-                <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
-                <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
-            </div>
-        </form>
-    </div>
+            <input type="text" name="nome" class="input-editar" maxlength="15" required value="{{ user.nome }}"
+                placeholder="Informe o Novo Nome">
 
-    <div class="editar" id="editar-senha">
-        <form class="form-editar">
-            <label for="password" class="label-editar">Editar Senha</label>
-            <input type="password" class="input-editar" placeholder="Informe a Nova Senha">
+            <input type="hidden" name="email" value="{{ user.email }}">
+            <input type="hidden" name="cpf" value="{{ user.cpf }}">
+
             <div class="botoes-acao">
                 <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
                 <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
             </div>
+
         </form>
     </div>
 
     <div class="editar" id="editar-cpf">
-        <form class="form-editar">
+        <form class="form-editar" action="/conta" method="POST">
             <label for="text" class="label-editar">Editar Cpf</label>
-            <input type="text" class="input-editar" placeholder="Informe o Novo Cpf">
+            <input type="text" name="cpf" inputmode="numeric" class="input-editar" required value="{{ user.cpf }}"
+                placeholder="Informe o Novo Cpf">
+
+            <input type="hidden" name="nome" value="{{ user.nome }}">
+            <input type="hidden" name="email" value="{{ user.email }}">
+
             <div class="botoes-acao">
                 <button class="confirmar botao-campo-editar" type="submit">Confirmar</button>
                 <button class="cancelar botao-campo-editar" type="button">Cancelar</button>
@@ -93,21 +99,23 @@
     <div class="excluir" id="id-exclui">
         <h3 class="texto-alerta">Tem certeza que deseja excluir sua conta?<br>Esta ação não é reversível!</h3>
         <div class="botoes-acao">
-            <button id="confirmar-exclusao">Excluir</button>
+            <form id="exclusao-final" action="/excluir" method="POST">
+                <button type="submit" id="confirmar-exclusao">Excluir</button>
+            </form>
             <button id="cancelar-exclusao" class="cancelar-excluir">Cancelar</button>
         </div>
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages-container">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
 
@@ -173,7 +181,7 @@
         });
     </script>
 
-        <!-- remove o alert do flash apos 5 segundos -->
+    <!-- remove o alert do flash apos 5 segundos -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const flashMessages = document.querySelectorAll('.alert');
@@ -191,6 +199,51 @@
                         }, 1000);
 
                     }, timeoutDuration);
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const botaoConfirmar = document.getElementById('confirmar-exclusao');
+            const botaoAbrirModal = document.getElementById('abrir-modal-excluir');
+            const modalExcluir = document.getElementById('id-exclui');
+            const botaoCancelar = document.getElementById('cancelar-exclusao');
+
+            const tempoAtraso = 10;
+            let timerInterval = null;
+            function iniciarContagemRegressiva() {
+                if (timerInterval) clearInterval(timerInterval);
+
+                let tempoRestante = tempoAtraso;
+                botaoConfirmar.disabled = true;
+                botaoConfirmar.textContent = `Aguarde (${tempoRestante}s)`;
+
+                timerInterval = setInterval(() => {
+                    tempoRestante--;
+
+                    if (tempoRestante > 0) {
+                        botaoConfirmar.textContent = `Aguarde (${tempoRestante}s)`;
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        botaoConfirmar.textContent = 'Excluir';
+                        botaoConfirmar.disabled = false;
+                    }
+                }, 1000);
+            }
+            if (botaoAbrirModal) {
+                botaoAbrirModal.addEventListener('click', function () {
+                    modalExcluir.style.display = 'flex';
+                    iniciarContagemRegressiva();
+                });
+            }
+
+            if (botaoCancelar) {
+                botaoCancelar.addEventListener('click', function () {
+                    modalExcluir.style.display = 'none';
+                    if (timerInterval) clearInterval(timerInterval); 
                 });
             }
         });

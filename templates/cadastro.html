@@ -21,7 +21,8 @@
         <h2>Cadastrar</h2>
         <form id="login-form" method="post" action="/cadastro">
             <label for="nome">Nome</label>
-            <input id="nome" type="text" name="nome" required maxlength="15" placeholder="Informe seu nome (max. 15 caracteres)">
+            <input id="nome" type="text" name="nome" required maxlength="15"
+                placeholder="Informe seu nome (max. 15 caracteres)">
 
             <label for="email">E-mail</label>
             <input id="email" type="email" name="email" required placeholder="Informe seu email">
@@ -34,7 +35,7 @@
             </div>
 
             <label for="cpf">CPF</label>
-            <input id="cpf" type="text" name="cpf" required placeholder="Informe seu cpf">
+            <input id="cpf" type="text" name="cpf" inputmode="numeric" required placeholder="Informe seu cpf">
             <div class="executar">
                 <button type="submit">Cadastrar</button>
                 <a id="cadastrar" href="/">Já possuo conta</a>
@@ -44,15 +45,15 @@
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages-container">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <!-- div da animcao inferior -->
@@ -126,7 +127,7 @@
         });
     </script>
 
-        <!-- remove o alert do flash apos 5 segundos -->
+    <!-- remove o alert do flash apos 5 segundos -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const flashMessages = document.querySelectorAll('.alert');
