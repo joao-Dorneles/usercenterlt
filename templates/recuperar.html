@@ -26,7 +26,7 @@
         </form>
     </div>
 
-    
+
 
     <!-- div da animcao inferior -->
     <div class="waves">
@@ -54,6 +54,29 @@
         form.addEventListener('submit', function (event) {
             event.preventDefault(); // sempre bloqueia primeiro
             form.submit();
+        });
+    </script>
+
+    <!-- remove o alert do flash apos 5 segundos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.alert');
+
+            if (flashMessages.length > 0) {
+                const timeoutDuration = 5000;
+
+                flashMessages.forEach(function (message) {
+                    setTimeout(function () {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 1s ease-out';
+
+                        setTimeout(function () {
+                            message.remove();
+                        }, 1000);
+
+                    }, timeoutDuration);
+                });
+            }
         });
     </script>
 
