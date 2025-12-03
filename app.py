@@ -5,9 +5,7 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
-# from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-# import smtplib
 from flask import jsonify
 import requests
 import socket
@@ -32,16 +30,6 @@ db = SQLAlchemy(app)
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "noreply@isso-nao-deve-ser-usado.com"))
-
-# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-# app.config['MAIL_PORT'] = 465
-# app.config['MAIL_USE_TLS'] = False 
-# app.config['MAIL_USE_SSL'] = True  
-# app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-# app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-# app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
-# app.config['MAIL_DEBUG'] = True
-# mail = Mail(app) PODE ESTAR DANDO ERRO [!]
 
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -309,7 +297,7 @@ def recuperar():
         if user:
             ok = email_recuperar(user)
             if ok:
-                flash("Um e-mail foi enviado com instruções para redefinir sua senha.", "info")
+                flash("Um e-mail foi enviado com instruções para redefinir sua senha. VERIFIQUE A CAIXA DE SPAM", "info")
             else:
                 flash("Falha ao enviar o e-mail de recuperação. Tente novamente mais tarde.", "danger")
             return redirect(url_for('index'))
@@ -403,63 +391,6 @@ def excluir_conta():
         print(f"ERRO AO EXCLUIR CONTA: {e}")
         flash("Ocorreu um erro ao excluir sua conta. Tente novamente.", "danger")
         return redirect(url_for('conta'))
-
-@app.route("/test-smtp")
-def test_smtp():
-    server = app.config.get("MAIL_SERVER")
-    port = int(app.config.get("MAIL_PORT", 0) or 0)
-    use_ssl = bool(app.config.get("MAIL_USE_SSL"))
-    use_tls = bool(app.config.get("MAIL_USE_TLS"))
-    user = app.config.get("MAIL_USERNAME")
-
-    try:
-        if use_ssl or port == 465:
-            s = smtplib.SMTP_SSL(server, port, timeout=10)
-        else:
-            s = smtplib.SMTP(server, port, timeout=10)
-            if use_tls or port == 587:
-                s.starttls()
-        if user:
-            s.login(user, app.config.get("MAIL_PASSWORD"))
-        s.quit()
-        return jsonify({"ok": True, "msg": "SMTP OK", "server": server, "port": port, "ssl": use_ssl, "tls": use_tls})
-    except Exception as e:
-        app.logger.exception("SMTP test failed")
-        return jsonify({"ok": False, "error": str(e)}), 500
-    
-
-@app.route("/diag-dns")
-def diag_dns():
-    try:
-        ip = socket.gethostbyname("smtp.gmail.com")
-        return jsonify({"ok": True, "smtp.gmail.com": ip})
-    except Exception as e:
-        return jsonify({"ok": False, "error": f"DNS fail: {e}"}), 500
-
-@app.route("/diag-conn")
-def diag_conn():
-    results = {}
-    try:
-        s = socket.create_connection(("smtp.gmail.com", 465), timeout=8)
-        s.close()
-        results["smtp_465"] = "ok"
-    except Exception as e:
-        results["smtp_465"] = f"fail: {e}"
-
-    try:
-        s = socket.create_connection(("api.sendgrid.com", 443), timeout=8)
-        s.close()
-        results["sendgrid_443"] = "ok"
-    except Exception as e:
-        results["sendgrid_443"] = f"fail: {e}"
-
-    try:
-        r = requests.get("https://api.sendgrid.com/v3/user/account", timeout=8)
-        results["http_sendgrid"] = {"status": r.status_code, "text_snippet": r.text[:200]}
-    except Exception as e:
-        results["http_sendgrid"] = f"fail: {e}"
-
-    return jsonify(results)
 
 if __name__ == "__main__":
     with app.app_context():
