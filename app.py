@@ -5,16 +5,15 @@ from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
-from flask_mail import Mail, Message
+# from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-import smtplib
+# import smtplib
 from flask import jsonify
 import requests
 import socket
 from sqlalchemy.sql.functions import coalesce
 import re
 
-#versao falha do sendgrid
 load_dotenv()
 
 app = Flask(__name__)
@@ -34,15 +33,15 @@ db = SQLAlchemy(app)
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "noreply@isso-nao-deve-ser-usado.com"))
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = False 
-app.config['MAIL_USE_SSL'] = True  
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_DEBUG'] = True
-mail = Mail(app)
+# app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+# app.config['MAIL_PORT'] = 465
+# app.config['MAIL_USE_TLS'] = False 
+# app.config['MAIL_USE_SSL'] = True  
+# app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+# app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+# app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+# app.config['MAIL_DEBUG'] = True
+# mail = Mail(app) PODE ESTAR DANDO ERRO [!]
 
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -121,32 +120,28 @@ def validar_cpf(cpf):
     return True
 
 def email_recuperar(user):
+    sg_key = os.getenv("SENDGRID_API_KEY")
+    sender_email = os.getenv("MAIL_DEFAULT_SENDER", "noreply.linhadotempo@gmail.com") 
+    
+    if not sg_key:
+        app.logger.error("SENDGRID_API_KEY não configurada. Falha no envio.")
+        return False
+        
     token = user.get_reset_token()
     reset_url = url_for('reset_token', token=token, _external=True)
 
     subject = "Redefinição de Senha"
     body = f"""Olá {user.nome or ''},
 
-    Para redefinir sua senha, clique no link abaixo:
-    {reset_url}
+Para redefinir sua senha, clique no link abaixo:
+{reset_url}
 
-    Se você não solicitou, ignore este e-mail.
-    """
+Se você não solicitou, ignore este e-mail.
+"""
     try:
-        msg = Message(subject, recipients=[user.email])
-        msg.body = body
-        mail.send(msg)
-        return True
-    except Exception as e:
-        app.logger.error(f"SMTP falhou. Tentando SendGrid. Erro: {e}")
-
-    try:
-        sg_key = os.getenv("SENDGRID_API_KEY")
-        if not sg_key:
-            return False
         data = {
             "personalizations": [{"to": [{"email": user.email}]}],
-            "from": {"email": os.getenv("MAIL_DEFAULT_SENDER")},
+            "from": {"email": sender_email},
             "subject": subject,
             "content": [{"type": "text/plain", "value": body}]
         }
@@ -157,10 +152,14 @@ def email_recuperar(user):
             headers={"Authorization": f"Bearer {sg_key}"}
         )
 
-        return r.status_code in (200, 202)
+        if r.status_code in (200, 202):
+            return True
+        else:
+            app.logger.error(f"SendGrid API Error {r.status_code}: {r.text[:200]}")
+            return False
 
     except Exception as e:
-        app.logger.error(f"SendGrid falhou também: {e}")
+        app.logger.error(f"SendGrid falhou totalmente (erro de rede/conexão): {e}")
         return False
     
 def login_required(f):
