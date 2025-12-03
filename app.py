@@ -166,7 +166,7 @@ def login_required(f):
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    next_url = request.args.get('next', url_for('conta'))
+    next_url = request.args.get('next', url_for('hubjogos')) #fallback temporario
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
         senha = request.form['senha']
@@ -223,7 +223,7 @@ def cadastro():
 def hubjogos(): 
     user_logado_id = session.get('user_id')
     ranking_data = usuarios.query.order_by(
-        coalesce(usuarios.score_jogo1, 0).desc() 
+        coalesce(usuarios.total_score, 0).desc() 
     ).all()
     return render_template("hubjogos.html", ranking_data=ranking_data, user_logado_id=user_logado_id)
 
