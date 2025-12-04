@@ -173,6 +173,7 @@ input::placeholder {
     flex-direction: column;
     align-items: center;
     margin-top: 20px;
+    z-index: 9999;
 }
 
 button {
@@ -218,6 +219,7 @@ button:hover {
     height: 150px;
     background: url(./images/general/wave.png);
     background-size: 1000px 150px;
+    border-top: 30px;
 }
 
 .wave1 {
