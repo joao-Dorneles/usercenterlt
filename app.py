@@ -31,6 +31,10 @@ db = SQLAlchemy(app)
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "noreply@isso-nao-deve-ser-usado.com"))
 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin_padrao") 
+ADMIN_PASSWORD_TEXT = os.getenv("ADMIN_PASSWORD", "senha_padrao_admin") 
+ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD_TEXT)
+
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
@@ -160,9 +164,53 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function    
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_logged_in' not in session or not session['admin_logged_in']:
+            flash("Acesso restrito. Faça login como administrador.", "danger")
+            return redirect(url_for('loginAdmin'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 #pra que tantos codigos...
 #se a vida não é programada...
 #e as melhores coisas não tem logica?
+
+@app.route("/loginAdmin", methods=['GET', 'POST'])
+def loginAdmin():
+    if request.method == 'POST':
+        usuario = request.form['usuario']
+        senha = request.form['senha']
+        
+        if usuario != ADMIN_USERNAME:
+            flash("Credenciais de administrador inválidas.", "danger")
+            return render_template("loginAdmin.html")
+
+        if check_password_hash(ADMIN_PASSWORD_HASH, senha):
+            session['admin_logged_in'] = True
+            flash("Login de Administrador realizado com sucesso!", "success")
+            return redirect(url_for('administradores'))
+        else:
+            flash("Credenciais de administrador inválidas.", "danger")
+            return render_template("loginAdmin.html")
+            
+    return render_template("loginAdmin.html")
+
+@app.route("/administradores")
+@admin_required 
+def administradores(): 
+    ranking_data = usuarios.query.order_by(
+        coalesce(usuarios.total_score, 0).desc() 
+    ).all()
+
+    return render_template("administradores.html", ranking_data=ranking_data)
+
+@app.route("/logoutAdmin")
+def logoutAdmin():
+    session.pop('admin_logged_in', None)
+    flash("Sessão de Administrador encerrada.", "info")
+    return redirect(url_for('loginAdmin'))
 
 @app.route("/", methods=['GET', 'POST'])
 def index():

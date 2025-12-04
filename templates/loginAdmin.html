@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administradores</title>
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
+</head>
+
+<body>
+
+    <header>
+        <a href="/hubjogos"><img class="img-header" id="seta-voltar"
+                src="../static/images/icons/seta-esquerda.png"></a>
+        <img class="img-header" id="logo" src="../static/images/general/logoNOBG.png">
+    </header>
+
+    <div class="formulario">
+        <h2>Área Restrita para Administradores</h2>
+        <form id="login-form" method="post" action="/loginAdmin">
+            <label for="text">Usuário</label>
+            <input id="text" type="text" name="usuario" required
+                placeholder="Insira o usuario informado pela equipe de T.I">
+
+            <label for="senha">Senha</label>
+            <input id="senha" type="password" name="senha" required
+                placeholder="Insira a senha informada pela equipe de T.I">
+            <div id="exibir-senha">
+                <input id="exibir" type="checkbox">
+                <label id="label-exibir-senha" for="exibir">Exibir Senha</label>
+            </div>
+            <div class="executar">
+                <button type="submit">Acessar</button>
+            </div>
+        </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- div da animcao inferior -->
+    <div class="waves">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+        <div class="wave wave3"></div>
+        <div class="wave wave4"></div>
+        <div class="wave wave5"></div>
+    </div>
+
+    <!-- vlibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- script para exibir senha -->
+    <script>
+        const checkboxExibir = document.getElementById('exibir');
+        const CampoSenha = document.getElementById('senha');
+        checkboxExibir.addEventListener('change', function () {
+            if (checkboxExibir.checked) {
+                CampoSenha.type = 'text'
+            } else {
+                CampoSenha.type = 'password'
+            }
+        });
+    </script>
+
+    <!-- remove o alert do flash apos 5 segundos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.alert');
+
+            if (flashMessages.length > 0) {
+                const timeoutDuration = 5000;
+
+                flashMessages.forEach(function (message) {
+                    setTimeout(function () {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 1s ease-out';
+
+                        setTimeout(function () {
+                            message.remove();
+                        }, 1000);
+
+                    }, timeoutDuration);
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>

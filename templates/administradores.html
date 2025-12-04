@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administradores</title>
+    <link rel="stylesheet" href="../static/hubjogos.css">
+    <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Moul&display=swap" rel="stylesheet">
+
+    <style>
+        #b-sair {
+            background-color: #D83737;
+            width: 8rem;
+            min-height: 3rem;
+            border-radius: 20px;
+            border: none;
+            transition: 0.5s;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        #b-sair:hover {
+            box-shadow: 0 0 10px #D83737;
+        }
+
+        a {
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            color: #FAF2E1;
+            font-family: "Jersey 10", sans-serif;
+            font-size: 1.5rem;
+        }
+
+        .titulo-alerta {
+            color: #D83737 !important;
+            font-size: 2rem;
+            text-align: center;
+            border: 3px solid #D83737;
+            padding: 1rem;
+            box-shadow: 0 0 10px #D83737;
+        }
+
+        .cpf {
+            font-size: 2rem;
+        }
+
+        @media(max-width: 540px) {
+            .titulo-alerta {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="div-botao-voltar">
+            <a href="https://linhadotempo.onrender.com">
+                <img class="img-botao-voltar" src="../static/images/icons/seta-branca.png" alt="voltar">
+            </a>
+        </div>
+
+        <div class="titulo-header">
+            <h2 class="texto-burguer-rush h2-header">Olá Administrador</h2>
+        </div>
+    </header>
+
+    <div class="ranking">
+        <h2 class="titulo-alerta titulo-classificacao">Lembre-se que o acesso e tratamento do <strong>CPF</strong> é
+            regido pela<br><strong>Lei Geral de Proteção de Dados (LGPD)</strong>. Este é um <strong>dado pessoal
+                sensível</strong> e<br>deve ser mantido estritamente confidencial.<br>Use-o apenas para fins
+            administrativos do sistema.</h2>
+
+        <h3 class="titulo-classificacao">Relação Pontos/Cpf</h3>
+        <table>
+            <thead>
+                <tr class="tr-topo">
+                    <th class="th-topo">Posição</th>
+                    <th class="th-topo">Cpf</th>
+                    <th class="th-topo">Pontos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in ranking_data %}
+                <tr class="{% if loop.index % 2 == 1 %}destaque{% endif %}">
+                    <td>{{ loop.index }}</td>
+                    <td class="cpf">{{ user.cpf }}</td>
+                    <td>{{ user.total_score }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">Nenhum usuário encontrado na classificação.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <button id="b-sair"><a href="/logoutAdmin">Sair</a></button>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- vlibras -->
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
+    <!-- remove o alert do flash apos 5 segundos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.alert');
+
+            if (flashMessages.length > 0) {
+                const timeoutDuration = 5000;
+
+                flashMessages.forEach(function (message) {
+                    setTimeout(function () {
+                        message.style.opacity = '0';
+                        message.style.transition = 'opacity 1s ease-out';
+
+                        setTimeout(function () {
+                            message.remove();
+                        }, 1000);
+
+                    }, timeoutDuration);
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
