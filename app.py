@@ -11,7 +11,6 @@ import requests
 import socket
 from sqlalchemy.sql.functions import coalesce
 import re
-from sqlalchemy.dialects.postgresql import MONEY
 
 load_dotenv()
 
@@ -48,7 +47,7 @@ class Produtos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text, nullable=True)
-    preco = db.Column(MONEY, nullable=False, default=0.00)
+    preco = db.Column(db.Float, nullable=False, default=0.00)
     categoria = db.Column(db.Text, nullable=False)
     imagem = db.Column(db.Text, nullable=False)
     
@@ -243,10 +242,28 @@ def editar_produto(produto_id):
     categoria = request.form.get('categoria')
     
     try:
-        preco = float(request.form.get('preco', produto.preco).replace(',', '.'))
+        preco_form = request.form.get('preco')
+        
+        if preco_form and preco_form.strip():
+            preco_str = preco_form.replace(',', '.')
+            preco = float(preco_str)
+        else:
+            preco = produto.preco 
+            
     except ValueError:
         flash("Preço inválido na edição.", "danger")
         return redirect(url_for('administradores'))
+    
+    if nome and nome.strip():
+        produto.nome = nome
+
+    if categoria and categoria.strip():
+        produto.categoria = categoria
+
+    if descricao and descricao.strip():
+        produto.descricao = descricao
+
+    produto.preco = preco
     
     if 'imagem_upload' in request.files:
         file = request.files['imagem_upload']
@@ -261,14 +278,9 @@ def editar_produto(produto_id):
             except Exception as e:
                 flash(f"Erro ao salvar nova imagem: {e}", "danger")
 
-    if not nome or preco <= 0 or not categoria:
-        flash("Nome, Preço válido e Categoria são campos obrigatórios na edição.", "danger")
+    if not produto.nome or produto.preco <= 0 or not produto.categoria:
+        flash("Nome, Preço válido e Categoria são campos obrigatórios e não podem ser apagados.", "danger")
         return redirect(url_for('administradores'))
-
-    produto.nome = nome
-    produto.descricao = descricao
-    produto.preco = preco
-    produto.categoria = categoria
     
     db.session.commit()
     flash(f"Produto '{produto.nome}' atualizado com sucesso!", "success")

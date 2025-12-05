@@ -55,6 +55,7 @@
             padding: 1rem;
             box-shadow: 0 0 10px #D83737;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            font-weight: 600;
         }
 
         .cpf {
@@ -91,11 +92,11 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: #FAF2E1;
+            background-color: #fffefb;
             border-radius: 15px;
             height: 35rem;
             gap: 10px;
-            border: 2px solid #D86037;
+            border: 2px solid #e68352;
             padding: 0.7rem;
         }
 
@@ -103,15 +104,18 @@
             font-size: 1.2rem;
         }
 
+        input::placeholder {
+            color: #52362b98;
+        }
+
         input,
         textarea {
-            background-color: transparent;
-            border: 0;
-            border-bottom: 2px solid #D86037;
+            background-color: #ffffff;
+            border: 2px solid #e68352;
             border-radius: 10px;
             outline: transparent;
             width: 15rem;
-            height: 1.5rem;
+            height: 1.7rem;
         }
 
         select {
@@ -151,7 +155,7 @@
             gap: 1rem;
         }
 
-        @media(max-width: 750px) {
+        @media(max-width: 860px) {
             .cards-produtos {
                 flex-direction: column;
             }
@@ -166,7 +170,7 @@
             margin: 15px;
             padding: 15px;
             border-radius: 12px;
-            background: #FAF2E1;
+            background-color: #fffefb;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
             font-family: Arial, sans-serif;
             border: 2px solid #D86037;
@@ -195,10 +199,24 @@
 
         .image {
             width: 100%;
-            max-height: 180px;
+            max-height: 250px;
             object-fit: cover;
             border-radius: 10px;
             margin-top: 10px;
+        }
+
+        @media(max-width: 450px) {
+            .table-card {
+                width: 18rem;
+                margin: 15px;
+                padding: 15px;
+                border-radius: 12px;
+                background-color: #fffefb;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+                font-family: Arial, sans-serif;
+                border: 2px solid #D86037;
+            }
+
         }
 
         .card-actions {
@@ -347,6 +365,11 @@
         .btn-salvar:hover {
             box-shadow: 0 0 10px #40954d;
         }
+
+        .sem-produtos {
+            font-family: "InkNutAntiqua", serif;
+            color: #D83737;
+        }
     </style>
 </head>
 
@@ -383,8 +406,8 @@
                     <option value="sobremesas">Sobremesas</option>
                 </select>
 
-                <label for="preco">Preço (Ex: 19.99):</label>
-                <input type="text" id="preco" name="preco" placeholder="Preço do Produto" required
+                <label for="preco">Preço:</label>
+                <input type="text" id="preco" name="preco" placeholder="Preço do Produto (Ex. 19,50)" required
                     pattern="[0-9]+([,\.][0-9]{1,2})?">
 
                 <label for="imagem_upload">Selecione uma Imagem:</label>
@@ -412,7 +435,7 @@
                 </div>
                 <div class="table-row">
                     <div class="label">Preço</div>
-                    <div class="value">R$ {{ produto.preco }}</div>
+                    <div class="value">R$ {{ "%.2f"|format(produto.preco|float) }}</div>
                 </div>
                 <div class="card-actions">
                     <button class="btn-editar" data-produto-id="{{ produto.id }}">
@@ -445,20 +468,20 @@
                     <input type="hidden" id="edit-produto-id" name="produto_id">
 
                     <label for="edit-nome">Nome:</label>
-                    <input type="text" id="edit-nome" name="nome" required>
+                    <input type="text" id="edit-nome" name="nome">
 
                     <label for="edit-descricao">Descrição:</label>
                     <textarea id="edit-descricao" name="descricao"></textarea>
 
                     <label for="edit-categoria">Categoria:</label>
-                    <select id="edit-categoria" name="categoria" required>
+                    <select id="edit-categoria" name="categoria">
                         <option value="lanches">Lanches</option>
                         <option value="bebidas">Bebidas</option>
                         <option value="sobremesas">Sobremesas</option>
                     </select>
 
                     <label for="edit-preco">Preço:</label>
-                    <input type="text" id="edit-preco" name="preco" required pattern="[0-9]+([,\.][0-9]{1,2})?">
+                    <input type="text" id="edit-preco" name="preco" pattern="[0-9]+([,\.][0-9]{1,2})?">
 
                     <label>Imagem Atual:</label>
                     <p id="current-image-url">Nenhuma</p>
@@ -473,9 +496,9 @@
         </div>
 
         <div class="ranking">
-            <h2 class="titulo-alerta titulo-classificacao">Lembre-se que o acesso e tratamento do <strong>CPF</strong> é
-                regido pela<br><strong>Lei Geral de Proteção de Dados (LGPD)</strong>. Este é um <strong>dado pessoal
-                    sensível</strong> e<br>deve ser mantido estritamente confidencial.<br>Use-o apenas para fins
+            <h2 class="titulo-alerta titulo-classificacao">Lembre-se que o acesso e tratamento do CPF é
+                regido pela<br>Lei Geral de Proteção de Dados (LGPD). Este é um dado pessoal
+                sensível e<br>deve ser mantido estritamente confidencial.<br>Use-o apenas para fins
                 administrativos do sistema.</h2>
 
             <h3 class="titulo-classificacao">Relação Pontos/Cpf</h3>
@@ -557,43 +580,18 @@
                 document.getElementById('modal-edicao').style.display = 'none';
             }
 
-            // Fecha o modal se o usuário clicar fora dele
             window.onclick = function (event) {
                 if (event.target == document.getElementById('modal-edicao')) {
                     fecharModal();
                 }
             }
 
-            // Função para abrir o modal e carregar os dados
             document.querySelectorAll('.btn-editar').forEach(button => {
                 button.addEventListener('click', function () {
-                    const produtoId = this.getAttribute('data-produto-id');
-
-                    // 🛑 PASSO CRÍTICO: Idealmente, você chamaria um endpoint Flask aqui
-                    // para obter os dados do produto por ID (via fetch/AJAX).
-                    // EXEMPLO SIMPLIFICADO: Iremos simular que os dados estão disponíveis no DOM, 
-                    // mas o ideal é fazer uma requisição.
-
-                    // --- SIMULAÇÃO DE PREENCHIMENTO DE DADOS (Você precisa adaptar) ---
-
-                    // 1. Defina o ACTION do formulário de edição
+                    const produtoId = this.getAttribute('data-produto-id');a: 
                     document.getElementById('form-edicao').action =
                         "{{ url_for('editar_produto', produto_id=0) }}".replace('0', produtoId);
-
                     document.getElementById('edit-produto-id').value = produtoId;
-
-                    // 2. Aqui você teria que buscar os dados exatos do produto via AJAX
-                    // Ex: fetch('/api/produto/' + produtoId)
-
-                    // Por enquanto, vamos carregar os dados brutos (NOME, DESCRICAO, etc.)
-                    // que você já tem disponíveis no loop Jinja2 (se os cards tiverem data attributes).
-
-                    // --- FIM DA SIMULAÇÃO ---
-
-                    // Se você passar todos os dados do produto via data-attributes no card,
-                    // você preencheria o formulário aqui.
-
-                    // 3. Abre o modal
                     document.getElementById('modal-edicao').style.display = 'block';
                 });
             });
