@@ -314,10 +314,6 @@ def administradores():
     ).all()
 
     produtos = Produtos.query.order_by(Produtos.id.asc()).all()
-
-    for p in produtos:
-        p.preco = float(p.preco)
-
     return render_template("administradores.html", ranking_data=ranking_data, produtos=produtos, IMAGEM_PADRAO_PRODUTO=IMAGEM_PADRAO_PRODUTO)
 
 @app.route("/logoutAdmin")
