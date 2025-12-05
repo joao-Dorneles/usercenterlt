@@ -422,7 +422,8 @@
                     </button>
                 </form>
             </div>
-            <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
+            <img class="image"
+                src="{{ url_for('static', filename='images/produtos/' + (produto.imagem or IMAGEM_PADRAO_PRODUTO)) }}"
                 alt="Imagem do produto: {{ produto.nome }}">
         </div>
         {% else %}

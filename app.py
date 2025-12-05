@@ -42,7 +42,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-IMAGEM_PADRAO_PRODUTO = "/static/images/produtos/notfound.jpeg"
+IMAGEM_PADRAO_PRODUTO = "notfound.jpeg"
 
 class Produtos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
