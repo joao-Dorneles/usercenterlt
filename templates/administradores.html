@@ -12,6 +12,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Moul&display=swap" rel="stylesheet">
 
     <style>
+        @font-face {
+            font-family: "InkNutAntiqua";
+            src: url(../static/fonts/InknutAntiqua-Regular.woff2) format("woff2"),
+                url(../static/fonts/InknutAntiqua-Regular.woff) format("woff");
+            font-weight: normal;
+            font-style: normal;
+        }
+
         #b-sair {
             background-color: #D83737;
             width: 8rem;
@@ -52,6 +60,283 @@
             .titulo-alerta {
                 font-size: 1.3rem;
             }
+
+            .cpf {
+                font-size: 1.5rem;
+            }
+        }
+
+        .texto-gerenciar {
+            font-size: 1.3rem;
+            font-family: "InkNutAntiqua", serif;
+            color: #52362B;
+        }
+
+        .gerenciamento {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: "InkNutAntiqua", serif;
+            color: #52362B;
+        }
+
+        .form-produto {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #FAF2E1;
+            border-radius: 15px;
+            height: 35rem;
+            gap: 10px;
+            border: 2px solid #D86037;
+            padding: 0.7rem;
+        }
+
+        label {
+            font-size: 1.2rem;
+        }
+
+        input,
+        textarea {
+            background-color: transparent;
+            border: 0;
+            border-bottom: 2px solid #D86037;
+            border-radius: 10px;
+            outline: transparent;
+            width: 15rem;
+            height: 1.5rem;
+        }
+
+        select {
+            border-radius: 5px;
+            border: 2px solid #D86037;
+            padding: 0.2rem;
+        }
+
+        #imagem_upload {
+            border: 0;
+            font-size: 0.7rem;
+            display: flex;
+            padding: 1rem;
+        }
+
+        #enviar-produto {
+            background-color: #40954d;
+            border-radius: 10px;
+            border: transparent;
+            padding: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.5s;
+        }
+
+        #enviar-produto:hover {
+            box-shadow: 0 0 10px #40954d;
+        }
+
+        #produtos-atuais {
+            font-size: 1.5rem;
+            font-family: "InkNutAntiqua", serif;
+        }
+
+        .tabela-produtos {
+            display: flex;
+            gap: 1rem;
+        }
+
+        @media(max-width: 750px) {
+            .tabela-produtos {
+                flex-direction: column;
+            }
+        }
+
+        .table-card {
+            width: 80%;
+            margin: 15px auto;
+            padding: 15px;
+            border-radius: 12px;
+            background: #FAF2E1;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            font-family: Arial, sans-serif;
+            border: 2px solid #D86037;
+        }
+
+        .table-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .value {
+            color: #444;
+            text-align: right;
+        }
+
+        .image {
+            width: 100%;
+            max-height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .card-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-grow: 1;
+            transition: 0.3s;
+        }
+
+        .btn-editar {
+            background-color: #3498db;
+            color: white;
+            transition: 0.5s;
+        }
+
+        .btn-editar:hover {
+            box-shadow: 0 0 5px #3498db;
+        }
+
+        .btn-remover {
+            background-color: #e74c3c;
+            color: white;
+            transition: 0.5s;
+        }
+
+        .btn-remover:hover {
+            box-shadow: 0 0 5px #e74c3c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #FAF2E1;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            border-radius: 15px;
+            border: 2px solid #D86037;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #form-edicao {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0.7rem;
+            gap: 10px;
+            width: 100%;
+            height: auto;
+            box-sizing: border-box;
+        }
+
+        #form-edicao label {
+            font-size: 1.2rem;
+            align-self: flex-start;
+            margin-top: 5px;
+        }
+
+        #form-edicao input:not([type="file"]):not([type="hidden"]),
+        #form-edicao textarea,
+        #form-edicao select {
+            background-color: transparent;
+            border: 0;
+            border-bottom: 2px solid #D86037;
+            border-radius: 10px;
+            outline: transparent;
+            width: 100%;
+            padding: 0.5rem 0.2rem;
+            height: 1.5rem;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        #form-edicao textarea {
+            height: 4rem;
+            border-radius: 5px;
+        }
+
+        #form-edicao select {
+            border: 2px solid #D86037;
+            padding: 0.2rem;
+            height: auto;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        #edit-imagem-upload {
+            border: 0;
+            font-size: 0.7rem;
+            display: flex;
+            padding: 1rem 0;
+            width: 100%;
+        }
+
+        .btn-salvar {
+            background-color: #40954d;
+            border-radius: 10px;
+            border: transparent;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.5s;
+            width: 100%;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+
+        .btn-salvar:hover {
+            box-shadow: 0 0 10px #40954d;
         }
     </style>
 </head>
@@ -69,85 +354,239 @@
         </div>
     </header>
 
-    <div class="ranking">
-        <h2 class="titulo-alerta titulo-classificacao">Lembre-se que o acesso e tratamento do <strong>CPF</strong> é
-            regido pela<br><strong>Lei Geral de Proteção de Dados (LGPD)</strong>. Este é um <strong>dado pessoal
-                sensível</strong> e<br>deve ser mantido estritamente confidencial.<br>Use-o apenas para fins
-            administrativos do sistema.</h2>
+    <div class="gerenciamento">
+        <h1 class="texto-gerenciar">Gerenciamento de Produtos</h1>
 
-        <h3 class="titulo-classificacao">Relação Pontos/Cpf</h3>
-        <table>
-            <thead>
-                <tr class="tr-topo">
-                    <th class="th-topo">Posição</th>
-                    <th class="th-topo">Cpf</th>
-                    <th class="th-topo">Pontos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in ranking_data %}
-                <tr class="{% if loop.index % 2 == 1 %}destaque{% endif %}">
-                    <td>{{ loop.index }}</td>
-                    <td class="cpf">{{ user.cpf }}</td>
-                    <td>{{ user.total_score }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="3">Nenhum usuário encontrado na classificação.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        <h2 class="texto-gerenciar">Adicionar Novo Produto</h2>
+        <div class="div-form">
+            <form class="form-produto" method="POST" action="/adicionar_produto" enctype="multipart/form-data">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" placeholder="Nome do Produto" required>
 
-    <button id="b-sair"><a href="/logoutAdmin">Sair</a></button>
+                <label for="descricao">Descrição:</label>
+                <textarea id="descricao" name="descricao" placeholder="Descrição do Produto"></textarea>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="flash-messages-container">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}" role="alert">
-            {{ message }}
+                <label for="categoria">Categoria:</label>
+                <select id="categoria" name="categoria" required>
+                    <option value="" disabled selected>Selecione a categoria</option>
+                    <option value="lanches">Lanches</option>
+                    <option value="bebidas">Bebidas</option>
+                    <option value="sobremesas">Sobremesas</option>
+                </select>
+
+                <label for="preco">Preço (Ex: 19.99):</label>
+                <input type="text" id="preco" name="preco" placeholder="Preço do Produto" required
+                    pattern="[0-9]+([,\.][0-9]{1,2})?">
+
+                <label for="imagem_upload">Selecione uma Imagem:</label>
+                <input type="file" id="imagem_upload" name="imagem_upload" accept="image/png, image/jpeg, image/gif">
+
+                <button id="enviar-produto" type="submit">Adicionar Produto</button>
+            </form>
         </div>
+
+        <h2 id="produtos-atuais">Produtos Atuais ({{ produtos | length }})</h2>
+        {% for produto in produtos %}
+        <div class="table-card">
+            <div class="table-row">
+                <div class="label">Nome</div>
+                <div class="value">{{ produto.nome }}</div>
+            </div>
+            <div class="table-row">
+                <div class="label">Descrição</div>
+                <div class="value">{{ produto.descricao | truncate(50, True) }}</div>
+            </div>
+            <div class="table-row">
+                <div class="label">Categoria</div>
+                <div class="value">{{ produto.categoria | capitalize }}</div>
+            </div>
+            <div class="table-row">
+                <div class="label">Preço</div>
+                <div class="value">R$ {{ "%.2f"|format(produto.preco|float) }}</div>
+            </div>
+            <div class="card-actions">
+                <button class="btn-editar" data-produto-id="{{ produto.id }}">
+                    Editar
+                </button>
+
+                <form method="POST" action="{{ url_for('remover_produto', produto_id=produto.id) }}"
+                    style="display:inline;">
+                    <button type="submit" class="btn-remover"
+                        onclick="return confirm('Tem certeza que deseja remover {{ produto.nome }}?');">
+                        Excluir
+                    </button>
+                </form>
+            </div>
+            <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
+                alt="Imagem do produto: {{ produto.nome }}">
+        </div>
+        {% else %}
+        <p class="sem-produtos">Nenhum produto cadastrado para exibição.</p>
         {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
 
-    <!-- vlibras -->
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
+        <div id="modal-edicao" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="fecharModal()">&times;</span>
+                <h3>Editar Produto</h3>
+
+                <form id="form-edicao" method="POST" action="" enctype="multipart/form-data">
+
+                    <input type="hidden" id="edit-produto-id" name="produto_id">
+
+                    <label for="edit-nome">Nome:</label>
+                    <input type="text" id="edit-nome" name="nome" required>
+
+                    <label for="edit-descricao">Descrição:</label>
+                    <textarea id="edit-descricao" name="descricao"></textarea>
+
+                    <label for="edit-categoria">Categoria:</label>
+                    <select id="edit-categoria" name="categoria" required>
+                        <option value="lanches">Lanches</option>
+                        <option value="bebidas">Bebidas</option>
+                        <option value="sobremesas">Sobremesas</option>
+                    </select>
+
+                    <label for="edit-preco">Preço:</label>
+                    <input type="text" id="edit-preco" name="preco" required pattern="[0-9]+([,\.][0-9]{1,2})?">
+
+                    <label>Imagem Atual:</label>
+                    <p id="current-image-url">Nenhuma</p>
+
+                    <label for="edit-imagem-upload">Nova Imagem (opcional):</label>
+                    <input type="file" id="edit-imagem-upload" name="imagem_upload"
+                        accept="image/png, image/jpeg, image/gif">
+
+                    <button type="submit" class="btn-salvar">Salvar Alterações</button>
+                </form>
+            </div>
         </div>
-    </div>
-    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-    <script>
-        new window.VLibras.Widget('https://vlibras.gov.br/app');
-    </script>
 
-    <!-- remove o alert do flash apos 5 segundos -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const flashMessages = document.querySelectorAll('.alert');
+        <div class="ranking">
+            <h2 class="titulo-alerta titulo-classificacao">Lembre-se que o acesso e tratamento do <strong>CPF</strong> é
+                regido pela<br><strong>Lei Geral de Proteção de Dados (LGPD)</strong>. Este é um <strong>dado pessoal
+                    sensível</strong> e<br>deve ser mantido estritamente confidencial.<br>Use-o apenas para fins
+                administrativos do sistema.</h2>
 
-            if (flashMessages.length > 0) {
-                const timeoutDuration = 5000;
+            <h3 class="titulo-classificacao">Relação Pontos/Cpf</h3>
+            <table>
+                <thead>
+                    <tr class="tr-topo">
+                        <th class="th-topo">Posição</th>
+                        <th class="th-topo">Cpf</th>
+                        <th class="th-topo">Pontos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in ranking_data %}
+                    <tr class="{% if loop.index % 2 == 1 %}destaque{% endif %}">
+                        <td>{{ loop.index }}</td>
+                        <td class="cpf">{{ user.cpf }}</td>
+                        <td>{{ user.total_score }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3">Nenhum usuário encontrado na classificação.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-                flashMessages.forEach(function (message) {
-                    setTimeout(function () {
-                        message.style.opacity = '0';
-                        message.style.transition = 'opacity 1s ease-out';
+        <button id="b-sair"><a href="/logoutAdmin">Sair</a></button>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- vlibras -->
+        <div vw class="enabled">
+            <div vw-access-button class="active"></div>
+            <div vw-plugin-wrapper>
+                <div class="vw-plugin-top-wrapper"></div>
+            </div>
+        </div>
+        <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+        <script>
+            new window.VLibras.Widget('https://vlibras.gov.br/app');
+        </script>
+
+        <!-- remove o alert do flash apos 5 segundos -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const flashMessages = document.querySelectorAll('.alert');
+
+                if (flashMessages.length > 0) {
+                    const timeoutDuration = 5000;
+
+                    flashMessages.forEach(function (message) {
                         setTimeout(function () {
-                            message.remove();
-                        }, 1000);
+                            message.style.opacity = '0';
+                            message.style.transition = 'opacity 1s ease-out';
 
-                    }, timeoutDuration);
-                });
+                            setTimeout(function () {
+                                message.remove();
+                            }, 1000);
+
+                        }, timeoutDuration);
+                    });
+                }
+            });
+        </script>
+
+        <script>
+            function fecharModal() {
+                document.getElementById('modal-edicao').style.display = 'none';
             }
-        });
-    </script>
+
+            // Fecha o modal se o usuário clicar fora dele
+            window.onclick = function (event) {
+                if (event.target == document.getElementById('modal-edicao')) {
+                    fecharModal();
+                }
+            }
+
+            // Função para abrir o modal e carregar os dados
+            document.querySelectorAll('.btn-editar').forEach(button => {
+                button.addEventListener('click', function () {
+                    const produtoId = this.getAttribute('data-produto-id');
+
+                    // 🛑 PASSO CRÍTICO: Idealmente, você chamaria um endpoint Flask aqui
+                    // para obter os dados do produto por ID (via fetch/AJAX).
+                    // EXEMPLO SIMPLIFICADO: Iremos simular que os dados estão disponíveis no DOM, 
+                    // mas o ideal é fazer uma requisição.
+
+                    // --- SIMULAÇÃO DE PREENCHIMENTO DE DADOS (Você precisa adaptar) ---
+
+                    // 1. Defina o ACTION do formulário de edição
+                    document.getElementById('form-edicao').action =
+                        "{{ url_for('editar_produto', produto_id=0) }}".replace('0', produtoId);
+
+                    document.getElementById('edit-produto-id').value = produtoId;
+
+                    // 2. Aqui você teria que buscar os dados exatos do produto via AJAX
+                    // Ex: fetch('/api/produto/' + produtoId)
+
+                    // Por enquanto, vamos carregar os dados brutos (NOME, DESCRICAO, etc.)
+                    // que você já tem disponíveis no loop Jinja2 (se os cards tiverem data attributes).
+
+                    // --- FIM DA SIMULAÇÃO ---
+
+                    // Se você passar todos os dados do produto via data-attributes no card,
+                    // você preencheria o formulário aqui.
+
+                    // 3. Abre o modal
+                    document.getElementById('modal-edicao').style.display = 'block';
+                });
+            });
+        </script>
 
 </body>
 

@@ -6,7 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Administradores</title>
     <link rel="stylesheet" href="../static/style.css">
-    <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
+
+    <style>
+        .titulo-admins {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +24,7 @@
     </header>
 
     <div class="formulario">
-        <h2>Área Restrita para Administradores</h2>
+        <h2 class="titulo-admins">Área Restrita para Administradores</h2>
         <form id="login-form" method="post" action="/loginAdmin">
             <label for="text">Usuário</label>
             <input id="text" type="text" name="usuario" required

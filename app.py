@@ -11,6 +11,7 @@ import requests
 import socket
 from sqlalchemy.sql.functions import coalesce
 import re
+from sqlalchemy.dialects.postgresql import MONEY
 
 load_dotenv()
 
@@ -34,6 +35,23 @@ DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "no
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin_padrao") 
 ADMIN_PASSWORD_TEXT = os.getenv("ADMIN_PASSWORD", "senha_padrao_admin") 
 ADMIN_PASSWORD_HASH = generate_password_hash(ADMIN_PASSWORD_TEXT)
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'images', 'produtos')
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+IMAGEM_PADRAO_PRODUTO = "/static/images/produtos/notfound.jpeg"
+
+class Produtos(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text, nullable=True)
+    preco = db.Column(MONEY, nullable=False, default=0.00)
+    categoria = db.Column(db.Text, nullable=False)
+    imagem = db.Column(db.Text, nullable=False)
+    
 
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -177,6 +195,97 @@ def admin_required(f):
 #se a vida não é programada...
 #e as melhores coisas não tem logica?
 
+@app.route("/admin/produtos/adicionar", methods=['POST'])
+@admin_required
+def adicionar_produto():
+    nome = request.form.get('nome')
+    descricao = request.form.get('descricao')
+    categoria = request.form.get('categoria')
+    
+    try:
+        preco = float(request.form.get('preco', 0).replace(',', '.'))
+    except ValueError:
+        flash("Preço inválido.", "danger")
+        return redirect(url_for('administradores'))
+
+    imagem_url = IMAGEM_PADRAO_PRODUTO
+
+    if 'imagem_upload' in request.files:
+        file = request.files['imagem_upload']
+        
+        if file and allowed_file(file.filename):
+            filename = file.filename 
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            try:
+                file.save(file_path)
+                imagem_url = '/static/images/produtos/' + filename
+            except Exception as e:
+                flash(f"Erro ao salvar a imagem: {e}", "danger")
+                
+    if not nome or preco <= 0 or not categoria:
+        flash("Nome, Preço válido e Categoria são campos obrigatórios.", "danger")
+        return redirect(url_for('administradores'))
+
+    novo_produto = Produtos(nome=nome, descricao=descricao, preco=preco, categoria=categoria, imagem=imagem_url)
+    db.session.add(novo_produto)
+    db.session.commit()
+    flash(f"Produto '{nome}' adicionado com sucesso!", "success")
+    return redirect(url_for('administradores'))
+
+@app.route("/admin/produtos/editar/<int:produto_id>", methods=['POST'])
+@admin_required
+def editar_produto(produto_id):
+    produto = Produtos.query.get_or_404(produto_id)
+    
+    nome = request.form.get('nome')
+    descricao = request.form.get('descricao')
+    categoria = request.form.get('categoria')
+    
+    try:
+        preco = float(request.form.get('preco', produto.preco).replace(',', '.'))
+    except ValueError:
+        flash("Preço inválido na edição.", "danger")
+        return redirect(url_for('administradores'))
+    
+    if 'imagem_upload' in request.files:
+        file = request.files['imagem_upload']
+        
+        if file and allowed_file(file.filename):
+            filename = file.filename
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            try:
+                file.save(file_path)
+                produto.imagem = '/static/images/produtos/' + filename
+            except Exception as e:
+                flash(f"Erro ao salvar nova imagem: {e}", "danger")
+
+    if not nome or preco <= 0 or not categoria:
+        flash("Nome, Preço válido e Categoria são campos obrigatórios na edição.", "danger")
+        return redirect(url_for('administradores'))
+
+    produto.nome = nome
+    produto.descricao = descricao
+    produto.preco = preco
+    produto.categoria = categoria
+    
+    db.session.commit()
+    flash(f"Produto '{produto.nome}' atualizado com sucesso!", "success")
+    return redirect(url_for('administradores'))
+
+@app.route("/admin/produtos/remover/<int:produto_id>", methods=['POST'])
+@admin_required
+def remover_produto(produto_id):
+    produto = Produtos.query.get_or_404(produto_id)
+    produto_nome = produto.nome
+    
+    db.session.delete(produto)
+    db.session.commit()
+    
+    flash(f"Produto '{produto_nome}' removido com sucesso!", "info")
+    return redirect(url_for('administradores'))
+
 @app.route("/loginAdmin", methods=['GET', 'POST'])
 def loginAdmin():
     if request.method == 'POST':
@@ -204,7 +313,9 @@ def administradores():
         coalesce(usuarios.total_score, 0).desc() 
     ).all()
 
-    return render_template("administradores.html", ranking_data=ranking_data)
+    produtos = Produtos.query.order_by(Produtos.id.asc()).all()
+
+    return render_template("administradores.html", ranking_data=ranking_data, produtos=produtos, IMAGEM_PADRAO_PRODUTO=IMAGEM_PADRAO_PRODUTO)
 
 @app.route("/logoutAdmin")
 def logoutAdmin():

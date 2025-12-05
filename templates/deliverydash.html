@@ -141,6 +141,7 @@
                 height: 450px;
             }
         }
+
         @media(min-width: 360px) {
             #gameCanvas {
                 height: 400px;
@@ -556,6 +557,15 @@
         function checkFoodCollection() {
             for (let i = foods.length - 1; i >= 0; i--) {
                 let f = foods[i];
+                if (magnetActive) {
+                    let dx = player.x + player.w / 2 - (f.x + f.w / 2);
+                    let dy = player.y + player.h / 2 - (f.y + f.h / 2);
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        f.x += dx / 15;
+                        f.y += dy / 15;
+                    }
+                }
                 if (collides(player, f)) {
                     score += f.points;
                     createPopup("+" + f.points, f.x, f.y);
@@ -564,14 +574,6 @@
                     if (score > currentHighScore) {
                         currentHighScore = score;
                         serverHighScoreDisplay.textContent = Math.floor(currentHighScore);
-                    }
-                    if (magnetActive) {
-                        let dx = player.x - f.x, dy = player.y - f.y;
-                        let dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < 150) {
-                            f.x += dx / 12;
-                            f.y += dy / 12;
-                        }
                     }
                 }
             }
