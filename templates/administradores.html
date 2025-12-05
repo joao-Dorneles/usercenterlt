@@ -153,6 +153,8 @@
         .cards-produtos {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         @media(max-width: 860px) {
@@ -489,7 +491,6 @@
                     <label for="edit-imagem-upload">Nova Imagem (opcional):</label>
                     <input type="file" id="edit-imagem-upload" name="imagem_upload"
                         accept="image/png, image/jpeg, image/gif">
-
                     <button type="submit" class="btn-salvar">Salvar Alterações</button>
                 </form>
             </div>
@@ -588,7 +589,7 @@
 
             document.querySelectorAll('.btn-editar').forEach(button => {
                 button.addEventListener('click', function () {
-                    const produtoId = this.getAttribute('data-produto-id');a: 
+                    const produtoId = this.getAttribute('data-produto-id'); a:
                     document.getElementById('form-edicao').action =
                         "{{ url_for('editar_produto', produto_id=0) }}".replace('0', produtoId);
                     document.getElementById('edit-produto-id').value = produtoId;
