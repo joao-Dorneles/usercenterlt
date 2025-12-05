@@ -155,10 +155,14 @@
             .tabela-produtos {
                 flex-direction: column;
             }
+
+            .table-card {
+                width: 18rem;
+            }
         }
 
         .table-card {
-            width: 80%;
+            width: 23rem;
             margin: 15px auto;
             padding: 15px;
             border-radius: 12px;
@@ -422,8 +426,7 @@
                     </button>
                 </form>
             </div>
-            <img class="image"
-                src="{{ url_for('static', filename='images/produtos/' + (produto.imagem or IMAGEM_PADRAO_PRODUTO)) }}"
+            <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
                 alt="Imagem do produto: {{ produto.nome }}">
         </div>
         {% else %}
