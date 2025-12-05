@@ -407,7 +407,7 @@
             </div>
             <div class="table-row">
                 <div class="label">Preço</div>
-                <div class="value">R$ {{ "%.2f"|format(produto.preco|float) }}</div>
+                <div class="value">R$ {{ "%.2f"|format(produto.preco|MONEY) }}</div>
             </div>
             <div class="card-actions">
                 <button class="btn-editar" data-produto-id="{{ produto.id }}">
