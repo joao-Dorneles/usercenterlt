@@ -219,7 +219,7 @@ def adicionar_produto():
 
             try:
                 file.save(file_path)
-                imagem_url = '/static/images/produtos/' + filename
+                imagem_url = filename
             except Exception as e:
                 flash(f"Erro ao salvar a imagem: {e}", "danger")
                 
@@ -257,7 +257,7 @@ def editar_produto(produto_id):
             
             try:
                 file.save(file_path)
-                produto.imagem = '/static/images/produtos/' + filename
+                produto.imagem = filename
             except Exception as e:
                 flash(f"Erro ao salvar nova imagem: {e}", "danger")
 
