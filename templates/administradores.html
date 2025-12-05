@@ -146,13 +146,13 @@
             font-family: "InkNutAntiqua", serif;
         }
 
-        .tabela-produtos {
+        .cards-produtos {
             display: flex;
             gap: 1rem;
         }
 
         @media(max-width: 750px) {
-            .tabela-produtos {
+            .cards-produtos {
                 flex-direction: column;
             }
 
@@ -395,43 +395,45 @@
         </div>
 
         <h2 id="produtos-atuais">Produtos Atuais ({{ produtos | length }})</h2>
-        {% for produto in produtos %}
-        <div class="table-card">
-            <div class="table-row">
-                <div class="label">Nome</div>
-                <div class="value">{{ produto.nome }}</div>
-            </div>
-            <div class="table-row">
-                <div class="label">Descrição</div>
-                <div class="value">{{ produto.descricao | truncate(50, True) }}</div>
-            </div>
-            <div class="table-row">
-                <div class="label">Categoria</div>
-                <div class="value">{{ produto.categoria | capitalize }}</div>
-            </div>
-            <div class="table-row">
-                <div class="label">Preço</div>
-                <div class="value">R$ {{ produto.preco }}</div>
-            </div>
-            <div class="card-actions">
-                <button class="btn-editar" data-produto-id="{{ produto.id }}">
-                    Editar
-                </button>
-
-                <form method="POST" action="{{ url_for('remover_produto', produto_id=produto.id) }}"
-                    style="display:inline;">
-                    <button type="submit" class="btn-remover"
-                        onclick="return confirm('Tem certeza que deseja remover {{ produto.nome }}?');">
-                        Excluir
+        <div class="cards-produtos">
+            {% for produto in produtos %}
+            <div class="table-card">
+                <div class="table-row">
+                    <div class="label">Nome</div>
+                    <div class="value">{{ produto.nome }}</div>
+                </div>
+                <div class="table-row">
+                    <div class="label">Descrição</div>
+                    <div class="value">{{ produto.descricao | truncate(50, True) }}</div>
+                </div>
+                <div class="table-row">
+                    <div class="label">Categoria</div>
+                    <div class="value">{{ produto.categoria | capitalize }}</div>
+                </div>
+                <div class="table-row">
+                    <div class="label">Preço</div>
+                    <div class="value">R$ {{ produto.preco }}</div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-editar" data-produto-id="{{ produto.id }}">
+                        Editar
                     </button>
-                </form>
+
+                    <form method="POST" action="{{ url_for('remover_produto', produto_id=produto.id) }}"
+                        style="display:inline;">
+                        <button type="submit" class="btn-remover"
+                            onclick="return confirm('Tem certeza que deseja remover {{ produto.nome }}?');">
+                            Excluir
+                        </button>
+                    </form>
+                </div>
+                <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
+                    alt="Imagem do produto: {{ produto.nome }}">
             </div>
-            <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
-                alt="Imagem do produto: {{ produto.nome }}">
+            {% else %}
+            <p class="sem-produtos">Nenhum produto cadastrado para exibição.</p>
+            {% endfor %}
         </div>
-        {% else %}
-        <p class="sem-produtos">Nenhum produto cadastrado para exibição.</p>
-        {% endfor %}
 
         <div id="modal-edicao" class="modal">
             <div class="modal-content">
