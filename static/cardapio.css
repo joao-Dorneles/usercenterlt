@@ -85,18 +85,27 @@ section {
     }
 
     .botao-voltar {
-        width: 3rem;
+        width: 3rem !important;
+    }
+
+    .img-produto {
+        width: 368px !important;
+        height: 244px !important;
     }
 }
 
 .infos {
     display: flex;
     flex-direction: column;
-    line-height: 1rem;
+    line-height: 2rem;
+    max-width: 50%;
 }
 
 .img-produto {
     border-radius: 30px;
+    object-fit: cover;
+    width: 258px; 
+    height: 171px;
 }
 
 .botao-voltar-topo {

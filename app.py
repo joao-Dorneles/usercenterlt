@@ -436,7 +436,7 @@ def conta():
         novo_cpf = request.form.get('cpf', user.cpf).strip()
     
         if not validar_nome(novo_nome):
-            flash("Nickname inválido. Use apenas letras e números, max 15.", "danger")
+            flash("Nome inválido. Use apenas letras e espaços, max 15.", "danger")
             return redirect(url_for('conta'))
 
         if not validar_email(novo_email):
