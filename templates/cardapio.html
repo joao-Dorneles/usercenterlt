@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../static/cardapio.css">
+    <link rel="shortcut icon" href="../static/images/general/logoNOBG.png">
+</head>
+
+<body>
+    <header id="header">
+        <a id="voltar" href="#"><img class="botao-voltar" src="../static/images/icons/seta-esquerda.png"
+                alt="seta-esquerda"></a>
+    </header>
+
+    <section class="lanches s-lanches">
+        <h1 class="titulo-lanches">Lanches</h1>
+        {% set lista_lanches = produtos_por_categoria.get('lanches', []) %}
+        {% if lista_lanches %}
+            {% for produto in lista_lanches %}
+        <div class="produto">
+            <div class="infos">
+                <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao | truncate(50, True) }}</p>
+                <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
+            </div>
+            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+        </div>
+        {% endfor %}
+        {% else %}
+            <div class="aviso-sem-produtos">
+                <p class="sem-produtos">Estamos sem produtos na categoria Lanches no momento. :( </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="sobremesas s-sobremesas">
+        <h1 class="titulo-lanches">Sobremesas</h1>
+        {% set lista_sobremesas = produtos_por_categoria.get('sobremesas', []) %}
+        {% if lista_sobremesas %}
+            {% for produto in lista_sobremesas %}
+        <div class="produto">
+            <div class="infos">
+                <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao | truncate(50, True) }}</p>
+                <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
+            </div>
+            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+        </div>
+        {% endfor %}
+        {% else %}
+            <div class="aviso-sem-produtos">
+                <p>Estamos sem produtos na categoria Sobremesas no momento. :( </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <section class="bebidas s-bebidas">
+        <h1 class="titulo-lanches">Bebidas</h1>
+        {% set lista_bebidas = produtos_por_categoria.get('bebidas', []) %}
+        {% if lista_bebidas %}
+            {% for produto in lista_bebidas %}
+        <div class="produto">
+            <div class="infos">
+                <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao | truncate(50, True) }}</p>
+                <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
+            </div>
+            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+        </div>
+        {% endfor %}
+        {% else %}
+            <div class="aviso-sem-produtos">
+                <p>Estamos sem produtos na categoria Bebidas no momento. :( </p>
+            </div>
+        {% endif %}
+    </section>
+
+    <button class="botao-voltar-topo"><a href="#header" class="link-voltar"><img src="../static/images/icons/acima.png"
+                alt="seta-cima" class="seta-cima"></a></button>
+</body>
+
+</html>

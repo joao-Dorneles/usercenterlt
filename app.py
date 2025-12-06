@@ -334,6 +334,19 @@ def logoutAdmin():
     flash("Sessão de Administrador encerrada.", "info")
     return redirect(url_for('loginAdmin'))
 
+@app.route("/cardapio")
+def cardapio():
+    CATEGORIAS_FIXAS = ['lanches', 'bebidas', 'sobremesas']
+    produtos_por_categoria = {cat: [] for cat in CATEGORIAS_FIXAS}
+    
+    todos_produtos = Produtos.query.filter(
+        Produtos.categoria.in_(CATEGORIAS_FIXAS)
+    ).order_by(Produtos.categoria, Produtos.nome).all()
+    
+    for produto in todos_produtos:
+        produtos_por_categoria[produto.categoria].append(produto)
+    return render_template("cardapio.html", produtos_por_categoria=produtos_por_categoria)
+
 @app.route("/", methods=['GET', 'POST'])
 def index():
     next_url = request.args.get('next', url_for('hubjogos')) #fallback temporario

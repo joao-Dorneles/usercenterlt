@@ -5,10 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Dash</title>
-    <!-- Carrega Tailwind CSS para estilização e responsividade -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos específicos do jogo */
         body {
             background-color: #111827;
             /* Fundo cinza escuro */
@@ -28,7 +26,6 @@
             overflow: hidden;
             margin-bottom: 20px;
             max-width: 480px;
-            /* Limita a largura máxima do canvas */
             width: 100%;
         }
 
@@ -37,7 +34,6 @@
             background-color: #000;
             width: 100%;
             height: 550px;
-            /* Altura fixa para o jogo de estrada */
         }
 
         #hud {
@@ -73,7 +69,6 @@
             font-weight: bold;
             z-index: 1000;
             display: none;
-            /* Inicialmente oculto */
         }
 
         #gameOver small {
@@ -188,13 +183,9 @@
 
 <body class="p-4 flex flex-col items-center min-h-screen">
 
-    <!-- MUSICA DE FUNDO -->
     <audio id="bgMusic" loop muted>
-        <!-- Assumindo que o caminho estático está correto no ambiente Flask -->
         <source src="../static/audio/Helios.mp3" type="audio/mpeg">
     </audio>
-
-    <!-- SONS DE EFEITOS -->
     <audio id="s_hit" preload="auto">
         <source src="../static/audio/hit.mp3" type="audio/mpeg">
     </audio>
@@ -281,8 +272,8 @@
 
             try {
                 bgMusic.muted = false;
-                bgMusic.play().catch(() => { /* ignorar */ });
-            } catch (e) { /* ignorar */ }
+                bgMusic.play().catch(() => {});
+            } catch (e) {}
 
             const effects = [s_hit, s_coin, s_magnet, s_heart, s_shield, s_gameover, s_start];
             effects.forEach(a => {
@@ -293,7 +284,7 @@
                     if (p && p.then) {
                         p.then(() => { a.pause(); a.currentTime = 0; }).catch(() => { /* bloqueado */ });
                     }
-                } catch (err) { /* ignorar */ }
+                } catch (err) {}
             });
         }
 
@@ -303,7 +294,7 @@
                 const cloned = audioEl.cloneNode(true);
                 cloned.muted = false;
                 cloned.volume = audioEl.volume ?? 1.0;
-                cloned.play().catch(() => { /* se bloquear, ignora */ });
+                cloned.play().catch(() => {});
             } catch (e) {
                 try { audioEl.play().catch(() => { }); } catch (err) { }
             }
@@ -311,12 +302,10 @@
 
         function firstInteractionHandler() {
             unlockAllAudio();
-            // Remove listeners for one-time execution
             window.removeEventListener("mousedown", firstInteractionHandler);
             window.removeEventListener("touchstart", firstInteractionHandler);
             window.removeEventListener("keydown", firstInteractionHandler);
         }
-        // Listen for the first user interaction
         window.addEventListener("mousedown", firstInteractionHandler, { once: true });
         window.addEventListener("touchstart", firstInteractionHandler, { once: true });
         window.addEventListener("keydown", firstInteractionHandler, { once: true });
@@ -324,18 +313,12 @@
         /* ---------------------------  
             Integração com Backend  
         --------------------------- */
-
-        /**
-         * Envia a pontuação final para o backend para salvar como recorde.
-         * @param {number} finalScore 
-         */
         async function saveScore(finalScore) {
             console.log("Tentando salvar pontuação:", finalScore);
             highScoreMessageEl.textContent = "Salvando recorde...";
-            highScoreMessageEl.style.display = 'block'; // Garante que a mensagem apareça
+            highScoreMessageEl.style.display = 'block';
 
             try {
-                // A ROTA FOI AJUSTADA PARA: /api/dash_score
                 const response = await fetch('/api/dash_score', {
                     method: 'POST',
                     headers: {
@@ -358,7 +341,6 @@
                         highScoreMessageEl.classList.add('text-gray-300');
                     }
                 } else {
-                    // Erro de autenticação ou servidor
                     console.error("Erro ao salvar pontuação:", result.message || response.statusText);
                     highScoreMessageEl.textContent = "Erro ao salvar pontuação (faça login ou tente novamente).";
                     highScoreMessageEl.classList.remove('text-yellow-400', 'text-gray-300');

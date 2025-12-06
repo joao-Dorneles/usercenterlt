@@ -1,0 +1,154 @@
+body,
+html {
+    overflow-x: hidden;
+    height: 100dvh;
+    padding: 0;
+    margin: 0;
+    scroll-behavior: smooth;
+}
+
+body {
+    display: flex;
+    background-color: #F2D5B3;
+    flex-direction: column;
+    font-family: "InkNutAntiqua", serif;
+}
+
+@font-face {
+    font-family: "InkNutAntiqua";
+    src: url(./fonts/InknutAntiqua-Regular.woff2) format("woff2"),
+        url(./fonts/InknutAntiqua-Regular.woff) format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem;
+    padding-top: 1.7rem;
+    height: 5rem;
+    box-shadow: inset 0 10px 0 0 #52362B;
+    width: 100%;
+}
+
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.botao-voltar {
+    width: 1.5rem;
+}
+
+section {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-bottom: 2rem;
+    margin-bottom: 0.5rem;
+    height: auto;
+}
+
+.produto {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 7rem;
+}
+
+@media(min-width: 780px) {
+    .produto {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 80%;
+    }
+
+}
+
+@media(min-width: 808px) {
+    .titulo {
+        font-size: 2rem !important;
+    }
+
+    .preco {
+        font-size: 3rem !important;
+    }
+
+    .infos {
+        line-height: 4rem !important;
+    }
+
+    .descricao {
+        font-size: 1.5rem !important;
+    }
+
+    .botao-voltar {
+        width: 3rem;
+    }
+}
+
+.infos {
+    display: flex;
+    flex-direction: column;
+    line-height: 1rem;
+}
+
+.img-produto {
+    border-radius: 30px;
+}
+
+.botao-voltar-topo {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 3rem;
+    bottom: 1rem;
+    right: 1rem;
+    border-radius: 100%;
+    border: 0;
+    transition: 0.5s;
+    background-color: #D95F3A;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.botao-voltar-topo:hover {
+    box-shadow: 0 0 10px #D95F3A;
+    transform: scale(1.1);
+}
+
+.seta-cima {
+    width: 1.5rem;
+}
+
+.titulo,
+.preco {
+    font-weight: 800;
+    font-size: 1.5rem;
+}
+
+.descricao {
+    font-size: 1rem;
+}
+
+.s-lanches {
+    box-shadow: inset 0 -10px 0 0 #52362B;
+}
+
+.s-sobremesas {
+    box-shadow: inset 0 10px 0 0 #D95F3A, inset 0 -10px 0 0 #52362B;
+}
+
+.s-bebidas {
+    box-shadow: inset 0 10px 0 0 #D95F3A;
+}
+
+@media(min-width: 500px) {
+    .img-produto {
+        width: 25rem;
+    }
+}
