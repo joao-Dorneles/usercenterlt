@@ -240,29 +240,20 @@ def editar_produto(produto_id):
     nome = request.form.get('nome')
     descricao = request.form.get('descricao')
     categoria = request.form.get('categoria')
-    
+    preco_form = request.form.get('preco')
+
+
     try:
-        preco_form = request.form.get('preco')
+        preco_str = preco_form.replace(',', '.')
+        preco = float(preco_str)
         
-        if preco_form and preco_form.strip():
-            preco_str = preco_form.replace(',', '.')
-            preco = float(preco_str)
-        else:
-            preco = produto.preco 
-            
-    except ValueError:
-        flash("Preço inválido na edição.", "danger")
+    except (ValueError, AttributeError):
+        flash("Preço inválido. Verifique o formato.", "danger")
         return redirect(url_for('administradores'))
     
-    if nome and nome.strip():
-        produto.nome = nome
-
-    if categoria and categoria.strip():
-        produto.categoria = categoria
-
-    if descricao and descricao.strip():
-        produto.descricao = descricao
-
+    produto.nome = nome
+    produto.categoria = categoria
+    produto.descricao = descricao
     produto.preco = preco
     
     if 'imagem_upload' in request.files:

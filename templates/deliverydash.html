@@ -228,11 +228,11 @@
 
     <div id="controls">
         <div></div>
-        <div class="btn" data-dir="up">▲</div>
+        <div class="btn" data-dir="up">△</div>
         <div></div>
-        <div class="btn" data-dir="left">◀</div>
-        <div class="btn" data-dir="down">▼</div>
-        <div class="btn" data-dir="right">▶</div>
+        <div class="btn" data-dir="left">◁</div>
+        <div class="btn" data-dir="down">▽</div>
+        <div class="btn" data-dir="right">▷</div>
     </div>
 
     <script>
@@ -272,8 +272,8 @@
 
             try {
                 bgMusic.muted = false;
-                bgMusic.play().catch(() => {});
-            } catch (e) {}
+                bgMusic.play().catch(() => { });
+            } catch (e) { }
 
             const effects = [s_hit, s_coin, s_magnet, s_heart, s_shield, s_gameover, s_start];
             effects.forEach(a => {
@@ -284,7 +284,7 @@
                     if (p && p.then) {
                         p.then(() => { a.pause(); a.currentTime = 0; }).catch(() => { /* bloqueado */ });
                     }
-                } catch (err) {}
+                } catch (err) { }
             });
         }
 
@@ -294,7 +294,7 @@
                 const cloned = audioEl.cloneNode(true);
                 cloned.muted = false;
                 cloned.volume = audioEl.volume ?? 1.0;
-                cloned.play().catch(() => {});
+                cloned.play().catch(() => { });
             } catch (e) {
                 try { audioEl.play().catch(() => { }); } catch (err) { }
             }
@@ -634,7 +634,7 @@
                 pauseBtn.textContent = "▶";
                 bgMusic.pause();
             } else {
-                pauseBtn.textContent = "⏸";
+                pauseBtn.textContent = "❚❚";
                 bgMusic.play().catch(() => { });
                 requestAnimationFrame(draw);
             }

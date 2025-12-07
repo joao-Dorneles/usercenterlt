@@ -171,6 +171,7 @@ button {
     cursor: pointer;
     color: #F1E5D1;
     font-family: "InkNutAntiqua", serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button:hover {

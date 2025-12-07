@@ -444,7 +444,9 @@
                     <div class="value">R$ {{ "%.2f"|format(produto.preco|float) }}</div>
                 </div>
                 <div class="card-actions">
-                    <button class="btn-editar" data-produto-id="{{ produto.id }}">
+                    <button class="btn-editar" data-produto-id="{{ produto.id }}" data-nome="{{ produto.nome }}"
+                        data-descricao="{{ produto.descricao }}" data-categoria="{{ produto.categoria }}"
+                        data-preco="{{ '%.2f'|format(produto.preco|float) }}" data-imagem="{{ produto.imagem }}">
                         Editar
                     </button>
 
@@ -593,10 +595,31 @@
 
             document.querySelectorAll('.btn-editar').forEach(button => {
                 button.addEventListener('click', function () {
-                    const produtoId = this.getAttribute('data-produto-id'); a:
+
+                    // Captura os dados do botão
+                    const produtoId = this.getAttribute('data-produto-id');
+                    const nome = this.getAttribute('data-nome');
+                    const descricao = this.getAttribute('data-descricao');
+                    const categoria = this.getAttribute('data-categoria');
+                    const preco = this.getAttribute('data-preco');
+                    const imagem = this.getAttribute('data-imagem');
+
+                    // 1. Define a ACTION correta do formulário
+                    // Substitui '0' pelo ID real para montar a URL de POST correta: /editar/123
                     document.getElementById('form-edicao').action =
                         "{{ url_for('editar_produto', produto_id=0) }}".replace('0', produtoId);
+
+                    // 2. Preenche os campos do formulário no modal
                     document.getElementById('edit-produto-id').value = produtoId;
+                    document.getElementById('edit-nome').value = nome;
+                    document.getElementById('edit-descricao').value = descricao;
+                    document.getElementById('edit-preco').value = preco;
+                    document.getElementById('current-image-url').textContent = imagem;
+
+                    // 3. Seleciona a categoria correta no <select>
+                    document.getElementById('edit-categoria').value = categoria;
+
+                    // 4. Exibe o modal
                     document.getElementById('modal-edicao').style.display = 'block';
                 });
             });
