@@ -15,7 +15,7 @@
                 alt="seta-esquerda"></a>
     </header>
 
-    <section class="lanches s-lanches">
+    <section id="secao-lanches" class="lanches s-lanches">
         <h1 class="titulo-lanches">Lanches</h1>
         {% set lista_lanches = produtos_por_categoria.get('lanches', []) %}
         {% if lista_lanches %}
@@ -35,7 +35,7 @@
         {% endif %}
     </section>
 
-    <section class="sobremesas s-sobremesas">
+    <section id="secao-sobremesas" class="sobremesas s-sobremesas">
         <h1 class="titulo-lanches">Sobremesas</h1>
         {% set lista_sobremesas = produtos_por_categoria.get('sobremesas', []) %}
         {% if lista_sobremesas %}
@@ -55,7 +55,7 @@
         {% endif %}
     </section>
 
-    <section class="bebidas s-bebidas">
+    <section id="secao-bebidas" class="bebidas s-bebidas">
         <h1 class="titulo-lanches">Bebidas</h1>
         {% set lista_bebidas = produtos_por_categoria.get('bebidas', []) %}
         {% if lista_bebidas %}

@@ -16,7 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev-secret-if-missing")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "chave-de-desenvolvimento")
 
 database_url = os.getenv("DATABASE_URL")
 if database_url:
