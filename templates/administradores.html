@@ -458,8 +458,7 @@
                         </button>
                     </form>
                 </div>
-                <img class="image" src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}"
-                    alt="Imagem do produto: {{ produto.nome }}">
+                <img class="image" src="{{ produto.imagem }}" alt="Imagem do produto: {{ produto.nome }}">
             </div>
             {% else %}
             <p class="sem-produtos">Nenhum produto cadastrado para exibição.</p>

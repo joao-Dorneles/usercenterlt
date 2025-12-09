@@ -25,7 +25,7 @@
                 <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao }}</p>
                 <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
             </div>
-            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+            <img src="{{ produto.imagem }}" alt="img-produto" class="img-produto">
         </div>
         {% endfor %}
         {% else %}
@@ -45,7 +45,7 @@
                 <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao }}</p>
                 <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
             </div>
-            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+            <img src="{{ produto.imagem }}" alt="img-produto" class="img-produto">
         </div>
         {% endfor %}
         {% else %}
@@ -65,7 +65,7 @@
                 <p class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao }}</p>
                 <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
             </div>
-            <img src="{{ url_for('static', filename='images/produtos/' + produto.imagem) }}" alt="img-produto" class="img-produto">
+            <img src="{{ produto.imagem }}" alt="img-produto" class="img-produto">
         </div>
         {% endfor %}
         {% else %}

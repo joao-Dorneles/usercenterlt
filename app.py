@@ -9,9 +9,9 @@ from itsdangerous import URLSafeTimedSerializer
 import requests
 from sqlalchemy.sql.functions import coalesce
 import re
-# import cloudinary
-# import cloudinary.uploader
-# from cloudinary.utils import cloudinary_url
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 load_dotenv()
 
@@ -28,6 +28,10 @@ if database_url:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_recycle": 1800,}
 db = SQLAlchemy(app)
+
+cloudinary.config(cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+api_key=os.getenv("CLOUDINARY_API_KEY"),
+api_secret=os.getenv("CLOUDINARY_API_SECRET"), secure=True)
 
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 DEFAULT_SENDER = os.getenv("MAIL_DEFAULT_SENDER", os.getenv("MAIL_USERNAME", "noreply@isso-nao-deve-ser-usado.com"))
@@ -207,6 +211,10 @@ def adicionar_produto():
     except ValueError:
         flash("Preço inválido.", "danger")
         return redirect(url_for('administradores'))
+    
+    if not nome or preco <= 0 or not categoria:
+        flash("Nome, Preço válido e Categoria são campos obrigatórios.", "danger")
+        return redirect(url_for('administradores'))
 
     imagem_url = IMAGEM_PADRAO_PRODUTO
 
@@ -214,19 +222,12 @@ def adicionar_produto():
         file = request.files['imagem_upload']
         
         if file and allowed_file(file.filename):
-            filename = file.filename 
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
             try:
-                file.save(file_path)
-                imagem_url = filename
+                upload_result = cloudinary.uploader.upload(file)
+                imagem_url = upload_result['secure_url']
             except Exception as e:
-                flash(f"Erro ao salvar a imagem: {e}", "danger")
+                flash(f"Erro ao fazer upload da imagem: {e}", "danger")
                 
-    if not nome or preco <= 0 or not categoria:
-        flash("Nome, Preço válido e Categoria são campos obrigatórios.", "danger")
-        return redirect(url_for('administradores'))
-
     novo_produto = Produtos(nome=nome, descricao=descricao, preco=preco, categoria=categoria, imagem=imagem_url)
     db.session.add(novo_produto)
     db.session.commit()
@@ -261,14 +262,11 @@ def editar_produto(produto_id):
         file = request.files['imagem_upload']
         
         if file and allowed_file(file.filename):
-            filename = file.filename
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            
             try:
-                file.save(file_path)
-                produto.imagem = filename
+                upload_result = cloudinary.uploader.upload(file)
+                produto.imagem = upload_result['secure_url']
             except Exception as e:
-                flash(f"Erro ao salvar nova imagem: {e}", "danger")
+                flash(f"Erro ao fazer upload da imagem: {e}", "danger")
 
     if not produto.nome or produto.preco <= 0 or not produto.categoria:
         flash("Nome, Preço e Categoria são campos obrigatórios e não podem ser apagados.", "danger")
