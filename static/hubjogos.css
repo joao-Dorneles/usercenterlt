@@ -77,7 +77,8 @@ a {
 .div-botao-voltar {
     display: flex;
     align-items: center;
-    width: 100%;
+    justify-content: space-between;
+    width: 98%;
     height: 70px;
     padding: 1.5rem;
 }
@@ -85,6 +86,11 @@ a {
 .img-botao-voltar {
     width: 1.5rem;
     height: 1.5rem;
+}
+
+.img-botao-conta {
+    width: 2.5rem;
+    height: 2.5rem;
 }
 
 a {

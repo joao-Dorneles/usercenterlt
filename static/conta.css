@@ -89,6 +89,14 @@ header {
     margin-left: 10px;
 }
 
+.game-header {
+    margin-right: 10px;
+}
+
+.img-game-header {
+    width: 45px;
+}    
+
 .minhas-infos {
     display: flex;
     justify-content: center;

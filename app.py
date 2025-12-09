@@ -6,11 +6,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
 from itsdangerous import URLSafeTimedSerializer
-from flask import jsonify
 import requests
-import socket
 from sqlalchemy.sql.functions import coalesce
 import re
+# import cloudinary
+# import cloudinary.uploader
+# from cloudinary.utils import cloudinary_url
 
 load_dotenv()
 
@@ -92,7 +93,7 @@ def validar_nome(nome):
     return re.match(padrao, nome) is not None
 
 def validar_senha(senha):
-    return len(senha) >= 6
+    return 6 <= len(senha) <= 8
 
 def validar_cpf(cpf):
     """
@@ -340,7 +341,7 @@ def cardapio():
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    next_url = request.args.get('next', url_for('hubjogos')) #fallback temporario
+    next_url = request.args.get('next', url_for('hubjogos'))
     if request.method == 'POST':
         email = request.form['email'].strip().lower()
         senha = request.form['senha']
@@ -349,7 +350,7 @@ def index():
         if user and user.check_senha(senha):
             session['user_id'] = user.id
             flash('Logado com sucesso!', 'success')
-            return redirect(next_url or url_for('hubjogos')) #fallback temporario
+            return redirect(next_url or url_for('hubjogos'))
         
         flash('Credenciais inválidas. Tente novamente.', 'danger')
         return render_template("index.html", next=next_url)
@@ -372,7 +373,7 @@ def cadastro():
             return render_template("cadastro.html")
 
         if not validar_senha(senha):
-            flash("A senha deve ter pelo menos 6 caracteres.", "danger")
+            flash("A senha deve ter entre 6 e 8 caracteres.", "danger")
             return render_template("cadastro.html")
 
         if not validar_cpf(cpf):
@@ -592,7 +593,6 @@ def snake_score():
         "total_score": user.total_score,
         "message": "Nova pontuação não é maior que o recorde. Total Score inalterado."
     }
-
 
 # essa rota é responsavel pela exclusao, ou seja, é critica [!]
 @app.route("/excluir", methods=['POST'])
