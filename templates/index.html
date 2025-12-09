@@ -12,9 +12,9 @@
 <body>
 
     <header>
-        <!-- <a href="https://linhadotempo.onrender.com"><img class="img-header" id="seta-voltar"
-                src="../static/images/icons/seta-esquerda.png"></a> remocao temporaria [!]-->
-        <img class="img-header" id="logo" src="../static/images/general/logoNOBG.png"> 
+        <a href="https://linhadotempo.onrender.com"><img class="img-header" id="seta-voltar"
+                src="../static/images/icons/seta-esquerda.png"></a>
+        <img class="img-header" id="logo" src="../static/images/general/logoNOBG.png">
     </header>
 
     <div class="formulario">
@@ -38,15 +38,15 @@
     </div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages-container">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+    {% if messages %}
+    <div class="flash-messages-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
     {% endwith %}
 
     <!-- div da animcao inferior -->
@@ -99,7 +99,7 @@
         });
     </script>
 
-        <!-- remove o alert do flash apos 5 segundos -->
+    <!-- remove o alert do flash apos 5 segundos -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const flashMessages = document.querySelectorAll('.alert');

@@ -271,7 +271,7 @@ def editar_produto(produto_id):
                 flash(f"Erro ao salvar nova imagem: {e}", "danger")
 
     if not produto.nome or produto.preco <= 0 or not produto.categoria:
-        flash("Nome, Preço válido e Categoria são campos obrigatórios e não podem ser apagados.", "danger")
+        flash("Nome, Preço e Categoria são campos obrigatórios e não podem ser apagados.", "danger")
         return redirect(url_for('administradores'))
     
     db.session.commit()
