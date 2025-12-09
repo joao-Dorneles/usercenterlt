@@ -216,7 +216,7 @@ def adicionar_produto():
         flash("Nome, Preço válido e Categoria são campos obrigatórios.", "danger")
         return redirect(url_for('administradores'))
 
-    imagem_url = IMAGEM_PADRAO_PRODUTO
+    imagem_url = "https://res.cloudinary.com/dftrooh3w/image/upload/v1765311622/vt8rjbtj08du9qjzk0xu.jpg"
 
     if 'imagem_upload' in request.files:
         file = request.files['imagem_upload']
