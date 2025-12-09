@@ -221,7 +221,7 @@ def adicionar_produto():
     if 'imagem_upload' in request.files:
         file = request.files['imagem_upload']
         
-        if file and allowed_file(file.filename):
+        if file.filename != '' and allowed_file(file.filename):
             try:
                 upload_result = cloudinary.uploader.upload(file)
                 imagem_url = upload_result['secure_url']
