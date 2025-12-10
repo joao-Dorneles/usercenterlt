@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import Flask, render_template, request, session, redirect, url_for, flash, make_response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -336,6 +336,25 @@ def cardapio():
     for produto in todos_produtos:
         produtos_por_categoria[produto.categoria].append(produto)
     return render_template("cardapio.html", produtos_por_categoria=produtos_por_categoria)
+
+@app.route("/api/search")
+def api_search():
+    termo = request.args.get('q', '') 
+    produtos_data = []
+
+    if termo:
+        produtos = Produtos.query.filter(
+            Produtos.nome.ilike(f'%{termo}%') | Produtos.descricao.ilike(f'%{termo}%')
+        ).all()
+        
+        for produto in produtos:
+            produtos_data.append({
+                'nome': produto.nome,
+                'descricao': produto.descricao,
+                'preco': "%.2f" % produto.preco, 
+                'imagem': produto.imagem 
+            })
+    return jsonify(produtos_data)
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
