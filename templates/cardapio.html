@@ -22,7 +22,7 @@
         {% for produto in lista_lanches %}
         <div class="produto">
             <div class="infos">
-                <p id="{{ produto.nome}}" class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao }}</p>
+                <p id="{{ produto.nome | replace(' ', '-') | lower }}" class="descricao"><span class="titulo">{{ produto.nome }}: </span>{{ produto.descricao }}</p>
                 <p class="preco">R$ {{ "%.2f"|format(produto.preco|float) }}</p>
             </div>
             <img src="{{ produto.imagem }}" alt="img-produto" class="img-produto">
