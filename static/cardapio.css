@@ -102,8 +102,9 @@ section {
     display: flex;
     flex-direction: column;
     line-height: 2rem;
-    max-width: 90%;
     text-align: left;
+    width: 100%;
+    margin: 1rem;
 }
 
 .img-produto {
