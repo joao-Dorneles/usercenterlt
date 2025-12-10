@@ -57,6 +57,7 @@ section {
     align-items: center;
     flex-direction: column;
     margin-bottom: 7rem;
+    max-width: 70%;
 }
 
 @media(min-width: 780px) {
@@ -104,7 +105,9 @@ section {
     line-height: 2rem;
     text-align: left;
     width: 100%;
-    margin: 1rem;
+    min-width: 0;
+    flex: 1 1 60%;
+    overflow-wrap: anywhere;
 }
 
 .img-produto {
