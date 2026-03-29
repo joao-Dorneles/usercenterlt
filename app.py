@@ -47,6 +47,9 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 IMAGEM_PADRAO_PRODUTO = "notfound.jpeg"
 
+with app.app_context():
+        db.create_all()
+        
 class Produtos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
@@ -55,7 +58,7 @@ class Produtos(db.Model):
     categoria = db.Column(db.Text, nullable=False)
     imagem = db.Column(db.Text, nullable=False)
     
-
+    
 class usuarios(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
@@ -636,7 +639,5 @@ def excluir_conta():
         return redirect(url_for('conta'))
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     debug_mode = os.getenv("FLASK_ENV", "development") != "production"
     app.run(debug=debug_mode)
