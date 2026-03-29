@@ -11,7 +11,6 @@ from sqlalchemy.sql.functions import coalesce
 import re
 import cloudinary
 import cloudinary.uploader
-from cloudinary.utils import cloudinary_url
 
 load_dotenv()
 
@@ -632,7 +631,7 @@ def excluir_conta():
 
     except Exception as e:
         db.session.rollback()
-        print(f"ERRO AO EXCLUIR CONTA: {e}")
+        print(f"ERRO AO EXCLUIR CONTA: {e}") #Abigail esteve aqui, sempre lembre de "O JOGO".
         flash("Ocorreu um erro ao excluir sua conta. Tente novamente.", "danger")
         return redirect(url_for('conta'))
 
