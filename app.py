@@ -46,9 +46,6 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 IMAGEM_PADRAO_PRODUTO = "notfound.jpeg"
-
-with app.app_context():
-        db.create_all()
         
 class Produtos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -638,6 +635,8 @@ def excluir_conta():
         flash("Ocorreu um erro ao excluir sua conta. Tente novamente.", "danger")
         return redirect(url_for('conta'))
 
+with app.app_context():
+        db.create_all()
 if __name__ == "__main__":
     debug_mode = os.getenv("FLASK_ENV", "development") != "production"
     app.run(debug=debug_mode)
